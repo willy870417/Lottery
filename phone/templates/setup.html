@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>設定獎品</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>設定獎品</h1>
+        <form action="{{ url_for('save_settings') }}" method="post" onsubmit="return validateForm(event)">
+            <div id="prize-container">
+                {% for prize, count in prizes.items() %}
+                <div class="prize-field">
+                    <input type="text" name="prize_name" value="{{ prize }}" placeholder="獎品名稱">
+                    <input type="number" name="prize_count" value="{{ count }}" placeholder="獎品數量" min="1">
+                    <button type="delete_button" onclick="removePrizeField(this)">刪除</button>
+                </div>
+                {% endfor %}
+            </div>
+            <button type="button" onclick="addPrizeField()">新增獎品欄位</button>
+            <button type="submit">保存設定並重新開始抽獎</button>
+            <!-- 返回按鈕，會回到 index.html -->
+            <a href="{{ url_for('index') }}" class="back-button">不儲存返回抽獎頁面</a>
+        </form>
+    </div>
+    <script>
+        function addPrizeField() {
+            const container = document.getElementById("prize-container");
+            const newField = document.createElement("div");
+            newField.classList.add("prize-field");
+            newField.innerHTML = 
+                '<input type="text" name="prize_name" placeholder="獎品名稱">' + " " +
+                '<input type="number" name="prize_count" placeholder="獎品數量" min="1">' + " " +
+                '<button type="delete_button" onclick="removePrizeField(this)">刪除</button>';
+            container.appendChild(newField);
+        }
+
+        function removePrizeField(button) {
+            const field = button.parentElement;
+            field.remove();
+        }
+
+        function validateForm(event) {
+            const prizeNames = document.getElementsByName("prize_name");
+            const prizeCounts = document.getElementsByName("prize_count");
+
+            for (let i = 0; i < prizeNames.length; i++) {
+                if (prizeNames[i].value.trim() === "" || prizeCounts[i].value.trim() === "") {
+                    alert("不能有空白欄位");
+                    event.preventDefault();
+                    return false;
+                }
+            }
+            return true;
+        }
+    </script>
+</body>
+</html>

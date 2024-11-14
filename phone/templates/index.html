@@ -18,30 +18,31 @@
         <!-- 歷史紀錄彈窗 -->
         <div id="history-modal" class="modal">
             <div class="modal-content">
-                <span class="close-btn" onclick="closeHistory()">&times;</span>
+                <span class="close" onclick="closeHistory()">&times;</span>
                 <h2>抽獎紀錄</h2>
                 <ul id="history-list">
                     <!-- 抽獎紀錄項目將在這裡動態插入 -->
                 </ul>
             </div>
         </div>
-
+    <!-- 開關按鈕：固定於整個畫面右上角 -->
+        <label class="switch" id="toggle-popup-switch">
+            <input type="checkbox" id="toggle-draw-popup" checked>
+            <span class="slider"></span>
+        </label>
+        <span class="popup-label">顯示抽獎結果彈窗</span>
 
     </div>
 
-    <!-- 開關按鈕：固定於整個畫面右上角 -->
-    <label class="switch" id="toggle-popup-switch">
-        <input type="checkbox" id="toggle-draw-popup" checked>
-        <span class="slider"></span>
-    </label>
-    <span class="popup-label">顯示抽獎結果彈窗</span>
+    
     
     <div id="prizes-container">
         {% if prizes %}
             <div id="prizes">
                 {% for prize in prizes %}
                     <button class="ticket" onclick="drawPrize(this)">
-                        ?
+                        {{ loop.index }}
+                        <!-- <img src="{{ url_for('static', filename='images/ticket.png') }}" alt="抽籤圖標"> -->
                     </button>
                 {% endfor %}
             </div>
@@ -167,9 +168,9 @@
         function addHistoryRecord(prize) {
             const now = new Date();
             const timeString = now.toLocaleTimeString('zh-Hant', { hour12: false }); // 格式化為 24 小時制
-            const record = `時間：${timeString}，獎品：${prize}`;
+            const record = `${timeString}, 獎品：${prize}`;
             
-            historyRecords.push(record); // 加入到歷史紀錄陣列
+            historyRecords.unshift(record); // 加入到歷史紀錄陣列的開頭
             updateHistoryList(); // 更新彈窗的顯示
         }
 

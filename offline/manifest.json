@@ -1,0 +1,21 @@
+{
+    "name": "抽獎系統",
+    "short_name": "抽獎",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#3b82f6",
+    "icons": [
+      {
+        "src": "button.jpg",
+        "sizes": "192x192",
+        "type": "image/img"
+      },
+      {
+        "src": "button.jpg",
+        "sizes": "512x512",
+        "type": "image/img"
+      }
+    ]
+  }
+  

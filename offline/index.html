@@ -9,14 +9,16 @@
     <style>
         .flip-card {
             perspective: 1000px;
+            border-radius: 30px;
         }
 
         .flip-card-inner {
             position: relative;
             width: 100%;
             height: 100%;
-            transition: transform 0.6s;
+            transition: transform 1.0s;
             transform-style: preserve-3d;
+            border-radius: 30px;
         }
 
         .flip-card.flipped .flip-card-inner {
@@ -28,6 +30,7 @@
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
+            border-radius: 30px;
         }
 
         .flip-card-back {
@@ -47,6 +50,36 @@
             const modal = document.getElementById("confirm-prize-modal");
             modal.classList.add("hidden");
         }
+
+        // 顯示抽獎結果並帶有翻牌效果的彈窗
+        function showFlipCardResult(prizeName) {
+            const modal = document.getElementById("flip-card-modal");
+            const cardBack = document.querySelector("#flip-card-modal .flip-card-back");
+            cardBack.textContent = prizeName;
+
+            // 設定卡片的背景圖為 button.jpg
+            const cardFront = document.querySelector("#flip-card-modal .flip-card-front");
+            cardFront.style.backgroundImage = "url('button.jpg')";
+            cardFront.style.backgroundSize = "cover";
+            cardFront.style.backgroundPosition = "center";
+
+            modal.classList.remove("hidden");
+
+            setTimeout(() => {
+                document.querySelector("#flip-card-modal .flip-card").classList.add("flipped");
+            }, 100);
+        }
+
+        // 關閉翻牌結果彈窗並顯示確認領取彈窗
+        function closeFlipCardModal() {
+            const modal = document.getElementById("flip-card-modal");
+            document.querySelector("#flip-card-modal .flip-card").classList.remove("flipped");
+            setTimeout(() => {
+                modal.classList.add("hidden");
+                showConfirmPrizeModal();
+            }, 600);
+        }
+
       if ('serviceWorker' in navigator) {
           navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
               console.log('Service Worker registered with scope:', registration.scope);
@@ -88,20 +121,14 @@
     </div>
 
     <!-- 標題 -->
-    <h1 class="text-4xl font-bold mb-4">抽獎系統</h1>
+    <h1 class="text-4xl font-bold mb-4">Cloud Bank 一番賞</h1>
     <div id="drawn-count" class="text-lg font-semibold mb-4">已抽到第 0 個籤</div>
 
-
-    <!-- 設定獎項與清空獎項按鈕 -->
-    
 
     <!-- 獎品區域 -->
     <div id="prizes-container" class="w-full max-w-4xl px-4">
         <div id="prizes" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 w-full"></div>
     </div>
-
-    <!-- 確認回朔籤彈窗 -->
-    
 
     <!-- 確認領取獎項彈窗 -->
     <div id="confirm-prize-modal" class="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
@@ -111,11 +138,16 @@
             <button class="bg-green-500 text-white px-4 py-2 rounded shadow-md hover:bg-green-600 mt-4 mx-auto block" onclick="closeConfirmPrizeModal()">確認</button>
         </div>
     </div>
-    <div id="result-modal" class="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
-        <div class="modal-content bg-white rounded-lg shadow-lg p-6 w-4/5 max-w-3xl">
-            <h3 class="text-2xl font-semibold mb-4">抽獎結果</h3>
-            <p id="result-content" class="text-lg text-gray-700"></p>
-            <button class="bg-red-500 text-white px-4 py-2 rounded shadow-md hover:bg-red-600 mt-4 mx-auto block" onclick="closeResultModal()">關閉</button>
+    
+    <!-- 翻牌結果彈窗 -->
+    <div id="flip-card-modal" class="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden" onclick="closeFlipCardModal()">
+        <div class="flip-card w-96 h-96">
+            <div class="flip-card-inner">
+                <div class="flip-card-front bg-white flex items-center justify-center"></div>
+                <div class="flip-card-back bg-blue-200 flex items-center justify-center text-xl font-bold">
+                    <!-- 獎項名稱會顯示在這裡 -->
+                </div>
+            </div>
         </div>
     </div>
 
@@ -148,8 +180,8 @@
                         <input type="number" placeholder="數量" class="prize-count border border-gray-300 rounded px-4 py-2 w-1/4">
                     </div>
                 </div>
-                <button type="button" id="add-prize-input" class="bg-blue-400 text-white px-3 py-2 rounded shadow-md hover:bg-blue-500">新增獎項欄位</button>
-                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded shadow-md hover:bg-green-600">新增獎項</button>
+                <button type="button" id="add-prize-input" class="bg-blue-400 text-white px-3 py-2 rounded shadow-md hover:bg-blue-500">+</button>
+                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded shadow-md hover:bg-green-600">確認</button>
             </form>
             <button class="bg-red-500 text-white px-4 py-2 rounded shadow-md hover:bg-red-600 mt-4" onclick="closeSetupModal()">關閉</button>
         </div>
@@ -205,7 +237,7 @@
         { name: "重低音藍芽喇叭", count: 1 },
         ];
         // 獎品資料
-        let prizes = JSON.parse(localStorage.getItem("prizes")) || defaultPrizes;
+        let prizes = JSON.parse(localStorage.getItem("prizes")) || [];
         let historyRecords = JSON.parse(localStorage.getItem("historyRecords")) || [];
         let drawnCount = parseInt(localStorage.getItem('drawnCount')) || historyRecords.length;
         let previousDrawn = null;
@@ -239,7 +271,7 @@
                     const img = document.createElement("img");
                     img.src = "button.jpg";
                     img.alt = "抽獎按鈕圖片";
-                    img.style = "width: 100%; height: 100%; object-fit: cover;"; // 按鈕顯示的圖片
+                    img.style = "width: 100%; height: 100%; object-fit: cover; border-radius: 30px;"; // 按鈕顯示的圖片
                     img.className = "w-full h-full"; // 確保圖片適應按鈕大小
                     cardFront.appendChild(img);
 
@@ -259,7 +291,10 @@
             });
 
             // 將卡片隨機排列
-            prizeCards = prizeCards.sort(() => Math.random() - 0.5);
+            for (let i = prizeCards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [prizeCards[i], prizeCards[j]] = [prizeCards[j], prizeCards[i]];
+            }
 
             // 將隨機排列的卡片添加到頁面
             prizeCards.forEach(card => prizesDiv.appendChild(card));
@@ -284,28 +319,14 @@
                 // 更新本地存儲
                 localStorage.setItem("prizes", JSON.stringify(prizes));
 
-                // 顯示結果彈窗
-                document.getElementById("result-content").textContent = `恭喜您抽中了：${prizeName}`;
-                showResultModal();
+                // 顯示結果彈窗並翻牌
+                showFlipCardResult(prizeName);
             }
         }
 
         // 更新已抽到第幾個籤的顯示
         function updateDrawnCountDisplay() {
             document.getElementById('drawn-count').textContent = `已抽到第 ${drawnCount} 個籤`;
-        }
-
-        // 顯示結果彈窗
-        function showResultModal() {
-            const modal = document.getElementById("result-modal");
-            modal.classList.remove("hidden");
-        }
-
-        // 關閉結果彈窗
-        function closeResultModal() {
-            const modal = document.getElementById("result-modal");
-            modal.classList.add("hidden");
-            showConfirmPrizeModal();
         }
 
         // 顯示抽獎歷史彈窗
@@ -346,7 +367,19 @@
 
         // 打開設定獎項彈窗
         document.getElementById("setup-button").addEventListener("click", () => {
-            document.getElementById("setup-modal").classList.remove("hidden");
+    // 預設顯示獎項清單
+    const prizeInputsDiv = document.getElementById("prize-inputs");
+    prizeInputsDiv.innerHTML = "";
+    defaultPrizes.forEach(prize => {
+        const prizeInput = document.createElement("div");
+        prizeInput.className = "flex items-center mb-2";
+        prizeInput.innerHTML = `
+            <input type="text" value="${prize.name}" class="prize-name border border-gray-300 rounded px-4 py-2 w-full mr-2">
+            <input type="number" value="${prize.count}" class="prize-count border border-gray-300 rounded px-4 py-2 w-1/4">
+        `;
+        prizeInputsDiv.appendChild(prizeInput);
+    });
+    document.getElementById("setup-modal").classList.remove("hidden");
         });
 
         // 關閉設定獎項彈窗
@@ -415,8 +448,6 @@
             closeUndoModal();
         }
 
-        
-
         // 清空獎項
         document.getElementById("clear-button").addEventListener("click", () => {
             if (confirm("確定要清空所有獎項嗎？此操作無法復原！")) {
@@ -431,13 +462,13 @@
 
         // 點擊彈窗外部關閉彈窗
         window.addEventListener("click", (e) => {
-            const resultModal = document.getElementById("result-modal");
+            const flipCardModal = document.getElementById("flip-card-modal");
             const setupModal = document.getElementById("setup-modal");
             const historyModal = document.getElementById("history-modal");
             const remainingModal = document.getElementById("remaining-modal");
 
-            if (e.target === resultModal) {
-                closeResultModal();
+            if (e.target === flipCardModal) {
+                closeFlipCardModal();
             }
             if (e.target === setupModal) {
                 closeSetupModal();
@@ -454,7 +485,6 @@
         document.addEventListener("DOMContentLoaded", setupPrizes);
     </script>
   
-
 <script>
     document.addEventListener('DOMContentLoaded', setupPrizes);
 </script>

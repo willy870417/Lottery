@@ -1,5 +1,5 @@
 {
-    "name": "抽獎系統",
+    "name": "CB抽獎",
     "short_name": "抽獎",
     "start_url": "./index.html",
     "display": "standalone",

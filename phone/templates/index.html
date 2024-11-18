@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>抽獎系統</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+
 </head>
 <body>
     <div class="header">
@@ -14,6 +16,9 @@
 
         <!-- 歷史紀錄按鈕，放在右下角 -->
         <button id="history-btn" onclick="showHistory()">歷史紀錄</button>
+
+        <!-- 回朔功能按鈕 -->
+        <button id="undo-btn" onclick="confirmUndo()">回朔</button>
 
         <!-- 歷史紀錄彈窗 -->
         <div id="history-modal" class="modal">
@@ -41,8 +46,8 @@
             <div id="prizes">
                 {% for prize in prizes %}
                     <button class="ticket" onclick="drawPrize(this)">
-                        {{ loop.index }}
-                        <!-- <img src="{{ url_for('static', filename='images/ticket.png') }}" alt="抽籤圖標"> -->
+                        <!-- {{ loop.index }} -->
+                        <img src="{{ url_for('static', filename='images/ticket.png') }}" alt="抽籤圖標">
                     </button>
                 {% endfor %}
             </div>
@@ -194,6 +199,32 @@
         // 關閉歷史紀錄彈窗
         function closeHistory() {
             document.getElementById('history-modal').style.display = 'none';
+        }
+        
+        // 回朔功能：將最後一次抽到的籤放回到獎品池
+        function confirmUndo() {
+            // 顯示確認視窗
+            const confirmAction = confirm("確定要回朔上一個抽出的籤嗎？");
+            if (confirmAction) {
+                // 如果用戶選擇「確定」，則執行回朔操作
+                fetch('/undo_draw', { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert(data.error);
+                        } else {
+                            alert(data.message);
+                            location.reload(); // 回朔成功後重新載入頁面
+                        }
+                    })
+                    .catch(error => {
+                        console.error("回朔時發生錯誤:", error);
+                        alert("回朔失敗，請稍後再試！");
+                    });
+            } else {
+                // 如果用戶選擇「取消」，則不進行任何操作
+                alert("回朔已取消");
+            }
         }
 
     </script>

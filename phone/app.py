@@ -116,6 +116,30 @@ def remaining():
     data = load_data()
     remaining_counts = {item: data['prizes'].count(item) for item in set(data['prizes'])}
     return jsonify(remaining_counts)
+    
+
+@app.route('/undo_draw', methods=['POST'])
+def undo_draw():
+    # 載入進度數據
+    data = load_data()
+
+    # 確保有抽獎記錄可以回朔
+    if not data['drawn']:
+        return jsonify({"error": "沒有可以回朔的抽獎記錄"}), 400
+
+    # 取出最後一次的抽獎
+    last_draw = data['drawn'].pop()
+
+    # 將該獎品放回剩餘獎品池的最後
+    data['prizes'].append(last_draw)
+
+    # 保存更新後的數據
+    save_data(data)
+
+    # 返回更新後的剩餘獎品統計
+    remaining_counts = {item: data['prizes'].count(item) for item in set(data['prizes'])}
+    return jsonify({"message": "回朔成功", "remaining": remaining_counts})
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

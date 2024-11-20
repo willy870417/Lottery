@@ -7,23 +7,32 @@ body {
     flex-direction: column;
     height: 100vh;
     background-color: #f4f4f4;
-    padding-top: 120px; /* 假設 header 的高度為 120px */
+    /* padding-top: 120px; 假設 header 的高度為 120px */
 }
 
 /* 固定頂部區域，包含標題、設定按鈕和剩餘獎品 */
-.header {
-    display: flex;
-    flex-direction: column; /* 垂直排列元素 */
-    align-items: center;
-    padding: 10px 20px;
-    background-color: #d3d3d3; /* 灰色 */
-    border-bottom: 1px solid #ccc;
-    width: 100%;
-    /* height: 16%; */
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1;
+.header-container {
+    position: relative; /* 建立定位上下文，讓內部元素可以絕對定位 */
+    display: inline-block; /* 確保圖片大小影響容器大小 */
+}
+
+.header-image {
+    max-width: 100%; /* 確保圖片適應容器寬度 */
+    height: auto;    /* 保持圖片比例 */
+    display: block;  /* 去掉圖片周圍的額外間距 */
+}
+
+.overlay {
+    position: absolute; /* 絕對定位於 header-container 中 */
+    top: 0;             /* 從圖片頂部開始 */
+    left: 0;            /* 從圖片左邊開始 */
+    width: 100%;        /* 填滿圖片寬度 */
+    height: 100%;       /* 填滿圖片高度 */
+    display: flex;      /* 使用 Flexbox 將按鈕置中 */
+    flex-direction: column; /* 按鈕垂直排列 */
+    justify-content: center; /* 垂直居中 */
+    align-items: center;     /* 水平居中 */
+    gap: 10px;          /* 按鈕之間的間距 */
 }
 
 /* 調整標題樣式 */
@@ -34,15 +43,18 @@ body {
 
 /* 剩餘獎品按鈕樣式 */
 .remaining-button {
-    margin-top: 10px;
+    /* margin-top: 10px; */
+    position: absolute;
+    bottom: 10px;
+    left: 20px;
     padding: 10px 20px;
-    font-size: 40px;
-    background-color: #4CAF50;
+    font-size: 20px;
+    background-color: #4caf4f77;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    width: 300px; /* 統一寬度 */
+    width: 200px; /* 統一寬度 */
     box-sizing: border-box; /* 確保 padding 不影響寬度 */
 }
 
@@ -117,7 +129,7 @@ body {
     display: flex;
     flex: 1;
     overflow-y: auto;
-    padding-top: 200px; /* 頂部留出空間以容納固定的 header */
+    padding-top: 0px; /* 頂部留出空間以容納固定的 header */
     justify-content: center;
     align-items: start;
 }
@@ -132,14 +144,15 @@ body {
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    background-color: #4CAF50;
     color: white;
     border: none;
     border-radius: 30px;
     text-align: center;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    /* box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); */
     transition: background-color 0.3s;
     margin: 20px;
+    position: relative;
+    background: none;
 }
 
 .ticket:disabled {
@@ -148,17 +161,42 @@ body {
 } 
 
 /*圖片版的CSS設定 */
-.ticket {
-    background-color: transparent;
-    border: none;                 
-    padding: 0;
-    cursor: pointer;
-}
 .ticket img {
     width: 400px;
     height: 400px;
     display: block;
     border-radius: 30px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+} 
+
+.ticket-image {
+    width: 400px; /* 抽籤圖片的寬度 */
+    border-radius: 30px;
+    height: auto;
+    transition: transform 1s, opacity 0.5s; /* 動畫時間和效果 */
+}
+
+/* 旋轉動畫的類名 */
+.rotate {
+    transform: rotateY(360deg); /* 旋轉 360 度 */
+}
+
+/* 打開動畫：透明度逐漸降低 */
+.open {
+    opacity: 0; /* 消失效果 */
+    transform: scale(1.2); /* 放大 */
+}
+
+/* 防止按鈕可點擊的樣式 */
+.unclickable {
+    pointer-events: none; /* 禁用點擊事件 */
+    opacity: 1; /* 調整透明度，讓它看起來暫時不可用 */
+}
+
+/* 已經抽中的按鈕樣式 */
+.opened {
+    pointer-events: none; /* 禁用點擊事件 */
+    background-color: #ccc; /* 可選：將已抽中的按鈕設置為金色背景 */
 }
 
 
@@ -302,15 +340,18 @@ button[type="submit"]:hover {
 /* 前往設定畫面按鈕 */
 .setup-button {
     display: block;
-    margin: 20px auto; /* 置中 */
+    position: absolute;
+    bottom: 70px;
+    left: 20px;
+    /* margin: 20px auto; 置中 */
     padding: 10px 20px;
-    font-size: 40px;
-    background-color: #4CAF50;
+    font-size: 20px;
+    background-color: #4caf4f77;
     color: white;
     border: none;
     border-radius: 5px;
     text-decoration: none;
-    width: 300px; /* 統一寬度 */
+    width: 200px; /* 統一寬度 */
     text-align: center;
     box-sizing: border-box; /* 確保 padding 不影響寬度 */
 }
@@ -389,14 +430,15 @@ input:checked + .slider:before {
 #history-btn {
     position: absolute;
     bottom: 10px;
-    right: 50px;
+    right: 10px;
     padding: 10px 20px;
-    font-size: 40px;
+    font-size: 20px;
     border: none;
-    background-color: #4CAF50;
+    background-color: #4caf4f77;
     color: white;
     border-radius: 5px;
     cursor: pointer;
+    width: 200px;
 }
 
 /* 彈窗的基本樣式 */
@@ -434,13 +476,42 @@ input:checked + .slider:before {
 /* 回朔按鈕 */
 #undo-btn {
     position: absolute;
-    bottom: 80px;
-    right: 50px;
+    bottom: 70px;
+    right: 10px;
     padding: 10px 20px;
-    font-size: 40px;
+    font-size: 20px;
     border: none;
-    background-color: #4CAF50;
+    background-color: #4caf4f77;
     color: white;
     border-radius: 5px;
     cursor: pointer;
+    width: 200px;
 }
+
+/* 動畫 */
+/* @keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+} */
+
+/* @keyframes flash {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+} */
+
+/* 抽獎動畫樣式 */
+/* .spin-animation {
+    animation: spin 1s ease-in-out;
+}
+
+.flash-animation {
+    animation: flash 1s ease-in-out;
+} */

@@ -5,7 +5,12 @@ import os
 
 app = Flask(__name__)
 DATA_FILE = 'progress.json'
+HISTORY_FILE = 'history.json'
 
+# 初始化 history.json（如果檔案不存在）
+if not os.path.exists(HISTORY_FILE):
+    with open(HISTORY_FILE, 'w') as file:
+        json.dump([], file)
 
 def load_data():
     if os.path.exists(DATA_FILE):
@@ -140,6 +145,32 @@ def undo_draw():
     remaining_counts = {item: data['prizes'].count(item) for item in set(data['prizes'])}
     return jsonify({"message": "回朔成功", "remaining": remaining_counts})
 
+# 獲取歷史紀錄
+@app.route('/get_history', methods=['GET'])
+def get_history():
+    with open(HISTORY_FILE, 'r') as file:
+        history = json.load(file)
+    return jsonify(history)
+
+# 新增歷史紀錄
+@app.route('/add_history', methods=['POST'])
+def add_history():
+    new_record = request.json.get('record')
+    if not new_record:
+        return jsonify({'error': '無效的紀錄'}), 400
+    with open(HISTORY_FILE, 'r+') as file:
+        history = json.load(file)
+        history.insert(0, new_record)  # 加到最前面
+        file.seek(0)
+        json.dump(history, file)
+    return jsonify({'message': '歷史紀錄已更新'})
+
+# 清除歷史紀錄
+@app.route('/clear_history', methods=['POST'])
+def clear_history():
+    with open(HISTORY_FILE, 'w') as file:
+        json.dump([], file)
+    return jsonify({'message': '歷史紀錄已清除'})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

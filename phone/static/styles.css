@@ -7,23 +7,41 @@ body {
     flex-direction: column;
     height: 100vh;
     background-color: #f4f4f4;
-    padding-top: 120px; /* 假設 header 的高度為 120px */
+    /* padding-top: 120px; 假設 header 的高度為 120px */
+}
+
+#header {
+    position: fixed; /* 固定位置 */
+    top: 0;          /* 距離頂部為 0 */
+    left: 0;         /* 距離左側為 0 */
+    width: 100%;     /* 填滿整個寬度 */
 }
 
 /* 固定頂部區域，包含標題、設定按鈕和剩餘獎品 */
-.header {
-    display: flex;
-    flex-direction: column; /* 垂直排列元素 */
-    align-items: center;
-    padding: 10px 20px;
-    background-color: #d3d3d3; /* 灰色 */
-    border-bottom: 1px solid #ccc;
-    width: 100%;
-    /* height: 16%; */
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1;
+.header-container {
+    position: relative; /* 建立定位上下文，讓內部元素可以絕對定位 */
+    display: inline-block; /* 確保圖片大小影響容器大小 */
+    position: fixed; /* 固定位置 */
+    z-index: 1000;
+}
+
+.header-image {
+    max-width: 100%; /* 確保圖片適應容器寬度 */
+    height: auto;    /* 保持圖片比例 */
+    display: block;  /* 去掉圖片周圍的額外間距 */
+}
+
+.overlay {
+    position: absolute; /* 絕對定位於 header-container 中 */
+    top: 0;             /* 從圖片頂部開始 */
+    left: 0;            /* 從圖片左邊開始 */
+    width: 100%;        /* 填滿圖片寬度 */
+    height: 100%;       /* 填滿圖片高度 */
+    display: flex;      /* 使用 Flexbox 將按鈕置中 */
+    flex-direction: column; /* 按鈕垂直排列 */
+    justify-content: center; /* 垂直居中 */
+    align-items: center;     /* 水平居中 */
+    gap: 10px;          /* 按鈕之間的間距 */
 }
 
 /* 調整標題樣式 */
@@ -34,15 +52,18 @@ body {
 
 /* 剩餘獎品按鈕樣式 */
 .remaining-button {
-    margin-top: 10px;
+    /* margin-top: 10px; */
+    position: absolute;
+    bottom: 10px;
+    left: 20px;
     padding: 10px 20px;
-    font-size: 40px;
-    background-color: #4CAF50;
+    font-size: 20px;
+    background-color: #4caf4f77;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    width: 300px; /* 統一寬度 */
+    width: 200px; /* 統一寬度 */
     box-sizing: border-box; /* 確保 padding 不影響寬度 */
 }
 
@@ -50,28 +71,26 @@ body {
     background-color: #45a049;
 }
 
-/* Modal 的樣式(彈窗) */
+/* 彈窗的基本樣式 */
 .modal {
     display: none; /* 預設隱藏 */
     position: fixed;
-    z-index: 1000;
-    left: 0;
     top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5); /* 半透明背景 */
     justify-content: center;
     align-items: center;
-    font-size: 40px;
+    z-index: 1000;
 }
 
-/* Modal 內容樣式 */
 .modal-content {
     background-color: #ffffff;
     padding: 20px;
     border-radius: 8px;
     width: 100%;
-    max-width: 400px;
+    max-width: 600px;
     text-align: center;
     position: relative;
     font-size: 40px;
@@ -132,14 +151,16 @@ body {
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    background-color: #4CAF50;
     color: white;
     border: none;
     border-radius: 30px;
     text-align: center;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    /* box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); */
     transition: background-color 0.3s;
     margin: 20px;
+    position: relative;
+    background: none;
+    z-index: 10;
 }
 
 .ticket:disabled {
@@ -148,17 +169,42 @@ body {
 } 
 
 /*圖片版的CSS設定 */
-.ticket {
-    background-color: transparent;
-    border: none;                 
-    padding: 0;
-    cursor: pointer;
-}
 .ticket img {
     width: 400px;
     height: 400px;
     display: block;
     border-radius: 30px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+} 
+
+.ticket-image {
+    width: 400px; /* 抽籤圖片的寬度 */
+    border-radius: 30px;
+    height: auto;
+    transition: transform 1s, opacity 0.5s; /* 動畫時間和效果 */
+}
+
+/* 旋轉動畫的類名 */
+.rotate {
+    transform: rotateY(360deg); /* 旋轉 360 度 */
+}
+
+/* 打開動畫：透明度逐漸降低 */
+.open {
+    opacity: 0; /* 消失效果 */
+    transform: scale(1.2); /* 放大 */
+}
+
+/* 防止按鈕可點擊的樣式 */
+.unclickable {
+    pointer-events: none; /* 禁用點擊事件 */
+    opacity: 1; /* 調整透明度，讓它看起來暫時不可用 */
+}
+
+/* 已經抽中的按鈕樣式 */
+.opened {
+    pointer-events: none; /* 禁用點擊事件 */
+    background-color: #8e8e8e; /* 可選：將已抽中的按鈕設置為灰色背景 */
 }
 
 
@@ -202,10 +248,6 @@ button[type="button"], button[type="submit"] {
     width: 100%;
     max-width: 400px; /* 設置最大寬度 */
 }
-
-/* button[type="button"]:hover, button[type="submit"]:hover {
-    background-color: #45a049;
-} */
 
 /* 刪除按鈕樣式 */
 button[type="delete_button"] {
@@ -302,15 +344,18 @@ button[type="submit"]:hover {
 /* 前往設定畫面按鈕 */
 .setup-button {
     display: block;
-    margin: 20px auto; /* 置中 */
+    position: absolute;
+    bottom: 70px;
+    left: 20px;
+    /* margin: 20px auto; 置中 */
     padding: 10px 20px;
-    font-size: 40px;
-    background-color: #4CAF50;
+    font-size: 20px;
+    background-color: #4caf4f77;
     color: white;
     border: none;
     border-radius: 5px;
     text-decoration: none;
-    width: 300px; /* 統一寬度 */
+    width: 200px; /* 統一寬度 */
     text-align: center;
     box-sizing: border-box; /* 確保 padding 不影響寬度 */
 }
@@ -319,107 +364,20 @@ button[type="submit"]:hover {
     background-color: #45a049; /* 滑鼠移上去變深的綠色 */
 }
 
-/* 顯示抽獎結果彈窗的開關 */
-#toggle-popup-switch {
-    position: absolute;
-    top: 80px;
-    right: 60px;
-    z-index: 1000; /* 保證開關在最上層 */
-}
-
-/* 顯示抽獎結果彈窗的字樣 */
-.popup-label {
-    position: absolute;
-    top: 24px;
-    right: 50px;
-    font-size: 30px;
-    color: #333;
-    z-index: 1000;
-}
-
-/* 原來的開關樣式 */
-/* 調整開關按鈕樣式 */
-.switch {
-    display: inline-block;
-    width: 80px; /* 調整寬度 */
-    height: 40px; /* 調整高度 */
-}
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: 0.4s;
-    border-radius: 34px;
-}
-
-/* 調整滑塊的尺寸 */
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 32px; /* 調整滑塊高度 */
-    width: 32px; /* 調整滑塊寬度 */
-    left: 4px; /* 微調位置 */
-    bottom: 4px;
-    background-color: white;
-    transition: 0.4s;
-    border-radius: 50%;
-}
-
-/* 當開關被打開時的樣式 */
-input:checked + .slider {
-    background-color: #4CAF50;
-}
-
-input:checked + .slider:before {
-    transform: translateX(40px); /* 調整滑動距離 */
-}
-
 /* 歷史紀錄按鈕樣式 */
 #history-btn {
     position: absolute;
     bottom: 10px;
-    right: 50px;
+    right: 10px;
     padding: 10px 20px;
-    font-size: 40px;
+    font-size: 20px;
     border: none;
-    background-color: #4CAF50;
+    background-color: #4caf4f77;
     color: white;
     border-radius: 5px;
     cursor: pointer;
-}
-
-/* 彈窗的基本樣式 */
-.modal {
-    display: none; /* 預設隱藏 */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* 半透明背景 */
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-content {
-    background-color: white;
-    padding: 20px;
-    width: 50%;
-    max-width: 600px;
-    border-radius: 10px;
-    text-align: center;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    width: 200px;
+    z-index: 1000;
 }
 
 #history-list {
@@ -431,16 +389,31 @@ input:checked + .slider:before {
     font-size: 40px;
 }
 
+#clear-history-btn{
+    margin-top: 80px;
+    position: center;
+    padding: 10px 20px;
+    font-size: 20px;
+    background-color: #4caf4f;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 200px; /* 統一寬度 */
+    box-sizing: border-box; /* 確保 padding 不影響寬度 */
+}
+
 /* 回朔按鈕 */
 #undo-btn {
     position: absolute;
-    bottom: 80px;
-    right: 50px;
+    bottom: 70px;
+    right: 10px;
     padding: 10px 20px;
-    font-size: 40px;
+    font-size: 20px;
     border: none;
-    background-color: #4CAF50;
+    background-color: #4caf4f77;
     color: white;
     border-radius: 5px;
     cursor: pointer;
+    width: 200px;
 }

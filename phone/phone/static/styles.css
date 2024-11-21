@@ -10,10 +10,19 @@ body {
     /* padding-top: 120px; 假設 header 的高度為 120px */
 }
 
+#header {
+    position: fixed; /* 固定位置 */
+    top: 0;          /* 距離頂部為 0 */
+    left: 0;         /* 距離左側為 0 */
+    width: 100%;     /* 填滿整個寬度 */
+}
+
 /* 固定頂部區域，包含標題、設定按鈕和剩餘獎品 */
 .header-container {
     position: relative; /* 建立定位上下文，讓內部元素可以絕對定位 */
     display: inline-block; /* 確保圖片大小影響容器大小 */
+    position: fixed; /* 固定位置 */
+    z-index: 1000;
 }
 
 .header-image {
@@ -62,28 +71,28 @@ body {
     background-color: #45a049;
 }
 
-/* Modal 的樣式(彈窗) */
+/* 彈窗的基本樣式 */
 .modal {
     display: none; /* 預設隱藏 */
     position: fixed;
-    z-index: 1000;
-    left: 0;
     top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5); /* 半透明背景 */
     justify-content: center;
     align-items: center;
-    font-size: 40px;
+    z-index: 1000;
 }
 
-/* Modal 內容樣式 */
 .modal-content {
+    
+
     background-color: #ffffff;
     padding: 20px;
     border-radius: 8px;
     width: 100%;
-    max-width: 400px;
+    max-width: 600px;
     text-align: center;
     position: relative;
     font-size: 40px;
@@ -129,7 +138,7 @@ body {
     display: flex;
     flex: 1;
     overflow-y: auto;
-    padding-top: 0px; /* 頂部留出空間以容納固定的 header */
+    padding-top: 200px; /* 頂部留出空間以容納固定的 header */
     justify-content: center;
     align-items: start;
 }
@@ -153,6 +162,7 @@ body {
     margin: 20px;
     position: relative;
     background: none;
+    z-index: 10;
 }
 
 .ticket:disabled {
@@ -240,10 +250,6 @@ button[type="button"], button[type="submit"] {
     width: 100%;
     max-width: 400px; /* 設置最大寬度 */
 }
-
-/* button[type="button"]:hover, button[type="submit"]:hover {
-    background-color: #45a049;
-} */
 
 /* 刪除按鈕樣式 */
 button[type="delete_button"] {
@@ -360,72 +366,6 @@ button[type="submit"]:hover {
     background-color: #45a049; /* 滑鼠移上去變深的綠色 */
 }
 
-/* 顯示抽獎結果彈窗的開關 */
-#toggle-popup-switch {
-    position: absolute;
-    top: 80px;
-    right: 60px;
-    z-index: 1000; /* 保證開關在最上層 */
-}
-
-/* 顯示抽獎結果彈窗的字樣 */
-.popup-label {
-    position: absolute;
-    top: 24px;
-    right: 50px;
-    font-size: 30px;
-    color: #333;
-    z-index: 1000;
-}
-
-/* 原來的開關樣式 */
-/* 調整開關按鈕樣式 */
-.switch {
-    display: inline-block;
-    width: 80px; /* 調整寬度 */
-    height: 40px; /* 調整高度 */
-}
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: 0.4s;
-    border-radius: 34px;
-}
-
-/* 調整滑塊的尺寸 */
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 32px; /* 調整滑塊高度 */
-    width: 32px; /* 調整滑塊寬度 */
-    left: 4px; /* 微調位置 */
-    bottom: 4px;
-    background-color: white;
-    transition: 0.4s;
-    border-radius: 50%;
-}
-
-/* 當開關被打開時的樣式 */
-input:checked + .slider {
-    background-color: #4CAF50;
-}
-
-input:checked + .slider:before {
-    transform: translateX(40px); /* 調整滑動距離 */
-}
-
 /* 歷史紀錄按鈕樣式 */
 #history-btn {
     position: absolute;
@@ -439,29 +379,7 @@ input:checked + .slider:before {
     border-radius: 5px;
     cursor: pointer;
     width: 200px;
-}
-
-/* 彈窗的基本樣式 */
-.modal {
-    display: none; /* 預設隱藏 */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* 半透明背景 */
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-content {
-    background-color: white;
-    padding: 20px;
-    width: 50%;
-    max-width: 600px;
-    border-radius: 10px;
-    text-align: center;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
 }
 
 #history-list {
@@ -487,31 +405,3 @@ input:checked + .slider:before {
     cursor: pointer;
     width: 200px;
 }
-
-/* 動畫 */
-/* @keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-} */
-
-/* @keyframes flash {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.5;
-    }
-} */
-
-/* 抽獎動畫樣式 */
-/* .spin-animation {
-    animation: spin 1s ease-in-out;
-}
-
-.flash-animation {
-    animation: flash 1s ease-in-out;
-} */

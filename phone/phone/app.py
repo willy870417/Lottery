@@ -6,7 +6,6 @@ import os
 app = Flask(__name__)
 DATA_FILE = 'progress.json'
 
-
 def load_data():
     if os.path.exists(DATA_FILE):
         with open(DATA_FILE, 'r') as f:
@@ -139,7 +138,6 @@ def undo_draw():
     # 返回更新後的剩餘獎品統計
     remaining_counts = {item: data['prizes'].count(item) for item in set(data['prizes'])}
     return jsonify({"message": "回朔成功", "remaining": remaining_counts})
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

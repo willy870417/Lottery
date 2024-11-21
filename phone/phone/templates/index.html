@@ -18,25 +18,7 @@
                 <button id="remaining-button" class="remaining-button" onclick="openRemainingModal()">查看剩餘獎品</button>
                 <button id="history-btn" onclick="showHistory()">歷史紀錄</button>
                 <button id="undo-btn" onclick="confirmUndo()">回朔</button>
-            <!-- 抽獎彈窗開關 -->
-            <!-- <label class="switch" id="toggle-popup-switch">
-                <input type="checkbox" id="toggle-draw-popup" checked>
-                <span class="slider"></span>
-            </label>
-            <span class="popup-label">顯示抽獎結果彈窗</span>
-            </div> -->
         </div>
-    
-        <!-- 歷史紀錄彈窗 -->
-        <div id="history-modal" class="modal">
-            <div class="modal-content">
-                <span class="close" onclick="closeHistory()">&times;</span>
-                <h2>抽獎紀錄</h2>
-                <ul id="history-list"></ul>
-            </div>
-        </div>
-        
-        
     </div>
 
     <!-- 音效 -->
@@ -80,6 +62,14 @@
         </div>
     </div>
 
+    <!-- 歷史紀錄彈窗 -->
+    <div id="history-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeHistory()">&times;</span>
+            <h2>抽獎紀錄</h2>
+            <ul id="history-list"></ul>
+        </div>
+    </div>
 
     <script>
         const initialRemaining = {{ remaining | tojson }};
@@ -125,10 +115,6 @@
                             // 將抽中的按鈕加上已抽中的類別
                             button.classList.add("opened");
 
-                            // 播放抽獎音效
-                            // const drawSound = document.getElementById("draw-sound");
-                            // drawSound.play();
-
                             // 顯示抽獎結果
                             document.getElementById("draw-result").innerHTML = `<p>您抽中了：${data.prize}</p>`;
                             showDrawModal(); // 顯示彈窗
@@ -157,8 +143,6 @@
         function closeDrawModal() {
             document.getElementById("draw-modal").style.display = "none";
         }
-
-
 
         function updateRemaining(remaining) {
             const remainingDiv = document.getElementById("remaining");

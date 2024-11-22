@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>抽獎系統</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+
+</head>
+<body>
+    <div class="header">
+        <div class="header-container">
+            <img src="{{ url_for('static', filename='images/header_puki_phone.jpg') }}" alt="抽獎系統標題" class="header-image">
+            
+            <!-- 疊加在圖片上的按鈕 -->
+            <div class="overlay">
+                <a href="{{ url_for('setup') }}" class="setup-button">前往設定畫面</a>
+                <button id="remaining-button" class="remaining-button" onclick="openRemainingModal()">查看剩餘獎品</button>
+                <button id="history-btn" onclick="showHistory()">歷史紀錄</button>
+                <button id="undo-btn" onclick="confirmUndo()">回朔</button>
+        </div>
+    </div>
+
+    <!-- 音效 -->
+    <audio id="draw-sound" src="{{ url_for('static', filename='sounds/draw.mp3') }}"></audio>
+
+    <div id="prizes-container">
+        {% if prizes %}
+            <div id="prizes">
+                {% for prize in prizes %}
+                    <button class="ticket" onclick="drawPrize(this)">
+                        <!-- {{ loop.index }} -->
+                        <img src="{{ url_for('static', filename='images/ticket_puki.jpg') }}" alt="抽籤圖標" class="ticket-image">
+                    </button>
+                {% endfor %}
+            </div>
+            <div id="result"></div>
+        {% else %}
+            <p>請先設置獎品後再進行抽獎。</p>
+        {% endif %}
+    </div>
+
+    <!-- 剩餘獎品的彈出視窗 -->
+    <div id="remaining-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeRemainingModal()">&times;</span>
+            <h3>剩餘獎品</h3>
+            <div id="remaining-content">
+                <!-- 剩餘獎品內容將在此更新 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 抽中獎項的彈出視窗 -->
+    <div id="draw-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeDrawModal()">&times;</span>
+            <h3>恭喜!</h3>
+            <div id="draw-result">
+                <!-- 抽中獎項的內容會在此更新 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 歷史紀錄彈窗 -->
+    <div id="history-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeHistory()">&times;</span>
+            <h2>抽獎紀錄</h2>
+            <ul id="history-list"></ul>
+        </div>
+    </div>
+
+    <script>
+        const initialRemaining = {{ remaining | tojson }};
+        
+        // 抽獎彈窗開關狀態
+        let isPopupEnabled = document.getElementById("toggle-draw-popup").checked;
+
+        // 當開關狀態改變時更新 isPopupEnabled
+        document.getElementById("toggle-draw-popup").addEventListener("change", function() {
+            isPopupEnabled = this.checked;
+        });
+
+        function drawPrize(button) {
+            const ticketImage = button.querySelector(".ticket-image");
+
+            // 播放抽獎音效
+            const drawSound = document.getElementById("draw-sound");
+            drawSound.play();
+
+            // 添加 unclickable 類別到所有按鈕，防止操作
+            const allButtons = document.querySelectorAll(".ticket");
+            allButtons.forEach(btn => btn.classList.add("unclickable"));
+
+            // 1. 添加旋轉動畫
+            ticketImage.classList.add("rotate");
+
+            // 2. 等待旋轉動畫結束後執行後續操作
+            setTimeout(() => {
+                // 移除旋轉動畫，添加打開動畫
+                ticketImage.classList.remove("rotate");
+                ticketImage.classList.add("open");
+
+                // 3. 執行抽獎邏輯
+                fetch("{{ url_for('draw') }}", { method: "POST" })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            document.getElementById("result").textContent = data.error;
+                        } else {
+                            // 更新按鈕為抽中的獎項
+                            button.textContent = data.prize;
+
+                            // 將抽中的按鈕加上已抽中的類別
+                            button.classList.add("opened");
+
+                            // 顯示抽獎結果
+                            document.getElementById("draw-result").innerHTML = `<p>您抽中了：${data.prize}</p>`;
+                            showDrawModal(); // 顯示彈窗
+
+                            // 更新歷史紀錄和剩餘獎品
+                            addHistoryRecord(data.prize);
+                            updateRemaining(data.remaining);
+                        }
+                    })
+                    .finally(() => {
+                        // 移除 unclickable 類別，只啟用未抽中的按鈕
+                        allButtons.forEach(btn => {
+                            if (!btn.classList.contains("opened")) {
+                                btn.classList.remove("unclickable");
+                            }
+                        });
+                    });
+            }, 1000); // 延遲 1 秒（與旋轉動畫時間一致）
+        }
+
+
+        function showDrawModal() {
+            document.getElementById("draw-modal").style.display = "flex";
+        }
+
+        function closeDrawModal() {
+            document.getElementById("draw-modal").style.display = "none";
+        }
+
+        function updateRemaining(remaining) {
+            const remainingDiv = document.getElementById("remaining");
+            remainingDiv.innerHTML = "<h3>剩餘獎品</h3>";
+            if (Object.values(remaining).every(count => count === 0)) {
+                remainingDiv.innerHTML += "<p>沒有獎品了</p>";
+            } else {
+                for (const [prize, count] of Object.entries(remaining)) {
+                    remainingDiv.innerHTML += `<p>${prize}: ${count}個</p>`;
+                }
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            updateRemaining(initialRemaining);
+        });
+
+        // 剩餘獎品視窗的開關
+        function openRemainingModal() {
+            document.getElementById("remaining-modal").style.display = "flex";
+            fetch("{{ url_for('remaining') }}")
+                .then(response => response.json())
+                .then(data => {
+                    const remainingContent = document.getElementById("remaining-content");
+                    remainingContent.innerHTML = "";
+                    if (Object.values(data).every(count => count === 0)) {
+                        remainingContent.innerHTML = "<p>沒有獎品了</p>";
+                    } else {
+                        for (const [prize, count] of Object.entries(data)) {
+                            remainingContent.innerHTML += `<p>${prize}: ${count}個</p>`;
+                        }
+                    }
+                });
+        }
+
+        function closeRemainingModal() {
+            document.getElementById("remaining-modal").style.display = "none";
+        }
+
+        let historyRecords = []; // 儲存歷史紀錄的陣列
+
+        // 抽獎後，新增紀錄
+        function addHistoryRecord(prize) {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('zh-Hant', { hour12: false }); // 格式化為 24 小時制
+            const record = `${timeString}, 獎品：${prize}`;
+            
+            historyRecords.unshift(record); // 加入到歷史紀錄陣列的開頭
+            updateHistoryList(); // 更新彈窗的顯示
+        }
+
+        // 更新彈窗中的歷史紀錄列表
+        function updateHistoryList() {
+            const historyList = document.getElementById('history-list');
+            historyList.innerHTML = ""; // 清空原有的列表內容
+
+            historyRecords.forEach(record => {
+                const listItem = document.createElement('li');
+                listItem.textContent = record;
+                historyList.appendChild(listItem);
+            });
+        }
+
+        // 顯示歷史紀錄彈窗
+        function showHistory() {
+            document.getElementById('history-modal').style.display = 'flex';
+        }
+
+        // 關閉歷史紀錄彈窗
+        function closeHistory() {
+            document.getElementById('history-modal').style.display = 'none';
+        }
+        
+        // 回朔功能：將最後一次抽到的籤放回到獎品池
+        function confirmUndo() {
+            // 顯示確認視窗
+            const confirmAction = confirm("確定要回朔上一個抽出的籤嗎？");
+            if (confirmAction) {
+                // 如果用戶選擇「確定」，則執行回朔操作
+                fetch('/undo_draw', { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert(data.error);
+                        } else {
+                            alert(data.message);
+                            location.reload(); // 回朔成功後重新載入頁面
+                        }
+                    })
+                    .catch(error => {
+                        console.error("回朔時發生錯誤:", error);
+                        alert("回朔失敗，請稍後再試！");
+                    });
+            } else {
+                // 如果用戶選擇「取消」，則不進行任何操作
+                alert("回朔已取消");
+            }
+        }
+
+    </script>
+</body>
+</html>

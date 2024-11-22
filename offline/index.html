@@ -15,14 +15,13 @@
             align-items: center;
             justify-content: center;
             width: 100%; /* 適應父容器 */
-            height: auto;
             aspect-ratio: 1; /* 確保卡片是正方形 */
         }
 
         .flip-card-inner {
             position: relative;
-            width: 100%;
-            height: 100%;
+            width: 90%;
+            height: 90%;
             transition: transform 1.0s;
             transform-style: preserve-3d;
             border-radius: 30px;
@@ -79,6 +78,11 @@
         transform: scale(1.2); /* 放大並隱藏 */
     }
 }
+#prizes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 一行 3 列 */
+    gap: 16px; /* 卡片之间的间距 */
+  }
 
     </style>
 <script>
@@ -188,8 +192,9 @@ function closePrizeModal() {
 
     <!-- 獎品區域 -->
     <div class="w-full flex justify-center items-center">
-        <div id="prizes-container" class="flex justify-center items-center w-4/5">
-            <div id="prizes" class="grid grid-cols-2 gap-x-0 gap-y-4 w-full max-w-xl place-items-center">
+        <div id="prizes-container" class="flex justify-center items-center w-full">
+            <div id="prizes" class="grid grid-cols-3 gap-4 w-full max-w-screen-md">
+            <!-- 卡片内容由 JavaScript 动态生成 -->
             </div>
         </div>
     </div>
@@ -401,11 +406,11 @@ function closePrizeModal() {
             prizesDiv.innerHTML = ""; // 清空內容
         
             // 設置顯示的卡片數量，根據裝置類型顯示 8 或 16 個卡片
-            const cardCount = window.innerWidth < 768 ? 8 : 16;
+            const cardCount = window.innerWidth < 460 ? 8 : 12;
         
             for (let i = 0; i < cardCount; i++) {
                 const card = document.createElement("div");
-                card.className = "flip-card max-w-[130px] md:w-full aspect-square flex items-center justify-center";
+                card.className = "flip-card";
                 card.onclick = (e) => {
                     if (!card.classList.contains('flipped') && sideMenu.classList.contains('-translate-x-full')) {
                         drawPrize(card);
@@ -423,7 +428,7 @@ function closePrizeModal() {
                 const img = document.createElement("img");
                 img.src = "ticket_puki.jpg";
                 img.alt = "抽獎按鈕圖片";
-                img.className = "w-full max-w-full h-auto max-h-full object-contain rounded-[30px] shadow-xl";
+                img.className = "w-full h-full object-contain rounded-[30px] shadow-xl";
                 cardFront.appendChild(img);
         
                 // 卡片背面

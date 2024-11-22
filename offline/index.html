@@ -83,6 +83,11 @@
     grid-template-columns: repeat(3, 1fr); /* 一行 3 列 */
     gap: 16px; /* 卡片之间的间距 */
   }
+@media (max-width: 768px) {
+    #prizes {
+        grid-template-columns: repeat(2, 1fr); /* 屏幕宽度小于 768px 时，一行 2 列 */
+    }
+}
 
     </style>
 <script>
@@ -191,7 +196,7 @@ function closePrizeModal() {
 
     <!-- 獎品區域 -->
     <div class="w-full flex justify-center items-center">
-        <div id="prizes-container" class="mx-4 flex justify-center items-center w-full">
+        <div id="prizes-container" class="md:mx-4 mx-8 flex justify-center items-center w-full">
             <div id="prizes" class="grid grid-cols-3 gap-4 w-full max-w-screen-md">
             <!-- 卡片内容由 JavaScript 动态生成 -->
             </div>
@@ -405,7 +410,7 @@ function closePrizeModal() {
             prizesDiv.innerHTML = ""; // 清空內容
         
             // 設置顯示的卡片數量，根據裝置類型顯示 8 或 16 個卡片
-            const cardCount = window.innerWidth < 460 ? 12 : 9;
+            const cardCount = window.innerWidth < 460 ? 8 : 9;
         
             for (let i = 0; i < cardCount; i++) {
                 const card = document.createElement("div");

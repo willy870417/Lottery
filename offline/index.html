@@ -406,7 +406,7 @@ function closePrizeModal() {
             prizesDiv.innerHTML = ""; // 清空內容
         
             // 設置顯示的卡片數量，根據裝置類型顯示 8 或 16 個卡片
-            const cardCount = window.innerWidth < 460 ? 8 : 12;
+            const cardCount = window.innerWidth < 460 ? 12 : 9;
         
             for (let i = 0; i < cardCount; i++) {
                 const card = document.createElement("div");

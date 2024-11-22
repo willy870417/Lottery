@@ -163,12 +163,12 @@ function closePrizeModal() {
     }
   </script>
 </head>
-<body class="bg-[#FFFCD2] flex flex-col relative h-screen max-h-screen overflow-hidden">
+<body class="bg-gray-100 flex flex-col relative h-screen max-h-screen overflow-hidden">
     <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40"></div>
 
     <!-- 標題 -->
     <div class="flex justify-center">
-        <img src="header_cb.png" style="width: auto; height: auto; max-width: 100%; max-height: 100%;">
+        <img src="header_puki.png" style="width: auto; height: auto; max-width: 100%; max-height: 100%;">
     </div>
 
     <div class="flex justify-end w-full py-2 pr-6">
@@ -179,8 +179,9 @@ function closePrizeModal() {
     
 
     <!-- 側選單 -->
-    <div id="side-menu" class="fixed top-0 left-0 h-full w-64 bg-[#E68D19] shadow-lg transform -translate-x-full transition-transform duration-300 z-50">
-        <div class="p-4 m-8">
+    <div id="side-menu" class="fixed top-0 left-0 h-full w-64 bg-white shadow-lg transform -translate-x-full transition-transform duration-300 z-50">
+        <div class="p-4">
+            <h2 class="text-2xl font-semibold mb-6">選單</h2>
             <button id="setup-button" class="bg-blue-500 text-white px-4 py-2 rounded shadow-md hover:bg-blue-600 w-full mb-4">設定獎項</button>
             <button id="undo-button" class="bg-purple-500 text-white px-4 py-2 rounded shadow-md hover:bg-purple-600 w-full mb-4">回朔前一支籠</button>
             <button id="history-button" class="bg-green-500 text-white px-4 py-2 rounded shadow-md hover:bg-green-600 w-full mb-4">查看抽獎歷史</button>
@@ -245,7 +246,7 @@ function closePrizeModal() {
     <!-- 卡片旋轉 -->
     <div id="flip-card-modal" class="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
         <div class="flip-card w-full aspect-square mx-6">
-            <img src="button.jpg" alt="Rotating Image" class="w-full max-w-full h-auto max-h-full object-contain rounded-[30px] shadow-xl">
+            <img src="ticket_puki.jpg" alt="Rotating Image" class="w-full max-w-full h-auto max-h-full object-contain rounded-[30px] shadow-xl">
         </div>
     </div>
 
@@ -256,7 +257,7 @@ function closePrizeModal() {
         <div class="relative mx-3 w-full max-w-md h-full max-h-[560px] rounded-[10px] bg-white flex flex-col items-center shadow-xl">
             <!-- 上半部分 -->
             <div class="w-full h-[40%] rounded-t-[10px] bg-[#d9d9d9]">
-                <img class="h-full" src="header_cb.png" alt="">
+                <img class="h-full" src="header_puki.png" alt="">
             </div>
           
             <!-- 獎品圖標 -->
@@ -294,7 +295,7 @@ function closePrizeModal() {
             <p id="prize-name" class="mt-8 text-4xl font-medium text-black">飲料提袋!!</p>
           
             <!-- 領取按鈕 -->
-            <button class="w-2/3 h-20 absolute bottom-[-32.5px] left-1/2 transform -translate-x-1/2 rounded-[10px] bg-[#FF3A3D] border-2 border-white shadow-xl text-2xl font-semibold text-black cursor-pointer text-white" onclick="closePrizeModal()">
+            <button class="w-2/3 h-20 absolute bottom-[-32.5px] left-1/2 transform -translate-x-1/2 rounded-[10px] bg-[#d9d9d9] border-2 border-white shadow-xl text-2xl font-semibold text-black cursor-pointer" onclick="closePrizeModal()">
               立即領取
             </button>
           </div>
@@ -425,7 +426,7 @@ function closePrizeModal() {
                 const cardFront = document.createElement("div");
                 cardFront.className = "flip-card-front w-full max-w-full h-auto max-h-full object-contain rounded-[30px] shadow-xl";
                 const img = document.createElement("img");
-                img.src = "button.jpg";
+                img.src = "ticket_puki.jpg";
                 img.alt = "抽獎按鈕圖片";
                 img.className = "w-full h-full object-contain rounded-[30px] shadow-xl";
                 cardFront.appendChild(img);

@@ -517,8 +517,8 @@ function closePrizeModal() {
             const remainingContent = document.getElementById("remaining-content");
             remainingContent.innerHTML = ""; // 清空原有的剩餘內容
 
-            prizes.forEach(prize => {
-                remainingContent.innerHTML += `<p>${prize.name}: ${prize.count} 個</p>`;
+            prizesLeft.forEach(prize => {
+                remainingContent.innerHTML += `<p>${prize.key}: ${prize.value} 個</p>`;
             });
 
             document.getElementById("remaining-modal").classList.remove("hidden");
@@ -570,10 +570,12 @@ function closePrizeModal() {
             const prizeCounts = document.querySelectorAll(".prize-count");
 
             prizes = [];
+            prizesLeft = {};
             prizeNames.forEach((input, index) => {
                 const name = input.value.trim();
                 const count = parseInt(prizeCounts[index].value, 10);
-
+                prizesLeft.name = count;
+                
                 if (name && count > 0) {
                     for (let i = 0; i < count; i++) {
                         prizes.push(name);

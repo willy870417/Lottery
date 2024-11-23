@@ -80,10 +80,15 @@
 }
 #prizes {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 一行 3 列 */
+    grid-template-columns: repeat(4, 1fr); 
     gap: 16px; /* 卡片之间的间距 */
   }
-@media (max-width: 768px) {
+  @media (max-width: 800px) {
+    #prizes {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+@media (max-width: 767px) {
     #prizes {
         grid-template-columns: repeat(2, 1fr); /* 屏幕宽度小于 768px 时，一行 2 列 */
     }
@@ -397,7 +402,7 @@ function closePrizeModal() {
         let drawnCount = parseInt(localStorage.getItem('drawnCount')) || historyRecords.length;
         updateDrawnCountDisplay();
         let prizesLeft = JSON.parse(localStorage.getItem("prizesLeft")) || [];
-        let previousDrawn = historyRecord[historyRecord.length - 1]?.prize;
+        let previousDrawn = historyRecords[historyRecords.length - 1]?.prize;
 
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -410,9 +415,14 @@ function closePrizeModal() {
         function setupPrizes() {
             const prizesDiv = document.getElementById("prizes");
             prizesDiv.innerHTML = ""; // 清空內容
-        
-            // 設置顯示的卡片數量，根據裝置類型顯示 8 或 16 個卡片
-            const cardCount = window.innerWidth < 460 ? 8 : 9;
+            
+            let cardCount; // 定義在外部，使用 `let` 可以在後續賦值
+
+            // 設置顯示的卡片數量，根據裝置類型顯示 8, 9或 16 個卡片
+            if(window.innerWidth < 460) {cardCount = 8;}
+            else if(window.innerWidth > 460 && innerWidth < 769) {cardCount = 9;}
+            else {cardCount = 16}
+
         
             for (let i = 0; i < cardCount; i++) {
                 const card = document.createElement("div");
@@ -506,7 +516,7 @@ function closePrizeModal() {
 
             historyRecords.forEach(record => {
                 const listItem = document.createElement("li");
-                listItem.textContent = `${record.time} - 獎品：${record.prize}`;
+                listItem.textContent = `序：${record.index} 時間：${record.time} - 獎品：${record.prize}`;
                 historyList.appendChild(listItem);
             });
 

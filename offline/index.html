@@ -630,7 +630,7 @@ function closePrizeModal() {
                 localStorage.setItem("prizes", JSON.stringify(prizes));
                 localStorage.setItem("historyRecords", JSON.stringify(historyRecords));
                 previousDrawn = null;
-                alert($`已成功回朔{previousDrawn}`);
+                alert(`已成功回朔${previousDrawn}`);
             }
             closeUndoModal();
         }

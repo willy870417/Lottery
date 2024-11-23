@@ -395,6 +395,7 @@ function closePrizeModal() {
         let prizes = JSON.parse(localStorage.getItem("prizes")) || [];
         let historyRecords = JSON.parse(localStorage.getItem("historyRecords")) || [];
         let drawnCount = parseInt(localStorage.getItem('drawnCount')) || historyRecords.length;
+        updateDrawnCountDisplay();
         let prizesLeft = JSON.parse(localStorage.getItem("prizesLeft")) || [];
         let previousDrawn = null;
 
@@ -586,7 +587,8 @@ function closePrizeModal() {
                     }
                 }
             });
-
+            historyRecords = [];
+            drawncount = 0;
             localStorage.setItem("prizes", JSON.stringify(prizes)); // 更新本地存儲
             localStorage.setItem("prizesLeft", JSON.stringify(prizesLeft));
             localStorage.removeItem("drawnCount"); // 移除本地存儲中的歷史紀錄
@@ -629,6 +631,7 @@ function closePrizeModal() {
             if (confirm("確定要清空所有獎項嗎？此操作無法復原！")) {
                 prizes = [];
                 historyRecords = [];
+                drawncount = 0;
                 localStorage.removeItem("prizes"); // 移除本地存儲中的獎項
                 localStorage.removeItem("historyRecords");
                 localStorage.setItem('drawnCount', 0);

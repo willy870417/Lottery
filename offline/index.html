@@ -397,7 +397,7 @@ function closePrizeModal() {
         let drawnCount = parseInt(localStorage.getItem('drawnCount')) || historyRecords.length;
         updateDrawnCountDisplay();
         let prizesLeft = JSON.parse(localStorage.getItem("prizesLeft")) || [];
-        let previousDrawn = null;
+        let previousDrawn = historyRecord[historyRecord.length - 1]?.prize;
 
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -463,15 +463,16 @@ function closePrizeModal() {
                 // 設置卡片背面顯示的獎項名稱
                 card.querySelector(".flip-card-back").textContent = prize;
                 card.classList.add("flipped");
+                
+                // 更新數據
+                drawnCount++;
+                prizesLeft[prize] -= 1;
         
                 // 更新歷史紀錄
                 const now = new Date().toLocaleString("zh-Hant", { hour12: false });
-                const drawnItem = { time: now, prize: prize };
+                const drawnItem = {index: drawnCount, time: now, prize: prize };
                 historyRecords.push(drawnItem);
-                drawnCount++;
                 
-                prizesLeft[prize] -= 1;
-        
                 // 更新本地存儲
                 localStorage.setItem("prizes", JSON.stringify(prizes));
                 localStorage.setItem("historyRecords", JSON.stringify(historyRecords));
@@ -610,18 +611,16 @@ function closePrizeModal() {
 
         function confirmUndoDraw() {
             if (previousDrawn) {
-                const prizeIndex = prizes.findIndex(prize => prize.name === previousDrawn.prize);
-                if (prizeIndex !== -1) {
-                    prizes[prizeIndex].count++;
-                    historyRecords.pop();
-                    drawnCount--;
-                    localStorage.setItem('drawnCount', drawnCount);
-                    updateDrawnCountDisplay();
-                    localStorage.setItem("prizes", JSON.stringify(prizes));
-                    localStorage.setItem("historyRecords", JSON.stringify(historyRecords));
-                    setupPrizes();
-                    previousDrawn = null;
-                }
+                prizes.push(previousDrawn);
+                historyRecords.pop();
+                prizsLeft[previousDrawn] += 1;
+                drawnCount--;
+                localStorage.setItem('drawnCount', drawnCount);
+                updateDrawnCountDisplay();
+                localStorage.setItem("prizes", JSON.stringify(prizes));
+                localStorage.setItem("historyRecords", JSON.stringify(historyRecords));
+                previousDrawn = null;
+                alert($`已成功回朔{previousDrawn}`);
             }
             closeUndoModal();
         }

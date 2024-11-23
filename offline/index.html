@@ -467,6 +467,8 @@ function closePrizeModal() {
                 const drawnItem = { time: now, prize: prize };
                 historyRecords.push(drawnItem);
                 drawnCount++;
+                
+                prizesLeft[prize] -= 1;
         
                 // 更新本地存儲
                 localStorage.setItem("prizes", JSON.stringify(prizes));
@@ -512,18 +514,18 @@ function closePrizeModal() {
             document.getElementById("history-modal").classList.add("hidden");
         }
 
-        // 顯示剩餘獎項彈窗
-        document.getElementById("remaining-button").addEventListener("click", () => {
-            const remainingContent = document.getElementById("remaining-content");
-            remainingContent.innerHTML = ""; // 清空原有的剩餘內容
+		// 顯示剩餘獎項彈窗
+		document.getElementById("remaining-button").addEventListener("click", () => {
+    		const remainingContent = document.getElementById("remaining-content");
+    		remainingContent.innerHTML = ""; // 清空原有的剩餘內容
 
-            prizesLeft.forEach(prize => {
-                remainingContent.innerHTML += `<p>${prize.key}: ${prize.value} 個</p>`;
-            });
+    		// 使用 Object.entries() 遍歷 prizesLeft 物件
+    		Object.entries(prizesLeft).forEach(([key, value]) => {
+       			remainingContent.innerHTML += `<p>${key}: ${value} 個</p>`;
+    		});
 
-            document.getElementById("remaining-modal").classList.remove("hidden");
-        });
-
+    		document.getElementById("remaining-modal").classList.remove("hidden");
+		});
         // 關閉剩餘獎項彈窗
         function closeRemainingModal() {
             document.getElementById("remaining-modal").classList.add("hidden");
@@ -574,7 +576,7 @@ function closePrizeModal() {
             prizeNames.forEach((input, index) => {
                 const name = input.value.trim();
                 const count = parseInt(prizeCounts[index].value, 10);
-                prizesLeft.name = count;
+                prizesLeft[name] = count;
                 
                 if (name && count > 0) {
                     for (let i = 0; i < count; i++) {

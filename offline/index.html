@@ -395,6 +395,7 @@ function closePrizeModal() {
         let prizes = JSON.parse(localStorage.getItem("prizes")) || [];
         let historyRecords = JSON.parse(localStorage.getItem("historyRecords")) || [];
         let drawnCount = parseInt(localStorage.getItem('drawnCount')) || historyRecords.length;
+        let prizesLeft = JSON.parse(localStorage.getItem("prizesLeft")) || [];
         let previousDrawn = null;
 
         function shuffle(array) {
@@ -473,6 +474,7 @@ function closePrizeModal() {
                 // 更新本地存儲
                 localStorage.setItem("prizes", JSON.stringify(prizes));
                 localStorage.setItem("historyRecords", JSON.stringify(historyRecords));
+                localStorage.setItem("prizesLeft", JSON.stringify(prizesLeft));
                 localStorage.setItem("drawnCount", drawnCount);
         
                 updateDrawnCountDisplay();
@@ -586,6 +588,7 @@ function closePrizeModal() {
             });
 
             localStorage.setItem("prizes", JSON.stringify(prizes)); // 更新本地存儲
+            localStorage.setItem("prizesLeft", JSON.stringify(prizesLeft));
             localStorage.removeItem("drawnCount"); // 移除本地存儲中的歷史紀錄
             updateDrawnCountDisplay();
             setupPrizes(); // 更新獎品顯示

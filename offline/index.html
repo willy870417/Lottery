@@ -613,7 +613,7 @@ function closePrizeModal() {
             if (previousDrawn) {
                 prizes.push(previousDrawn);
                 historyRecords.pop();
-                prizsLeft[previousDrawn] += 1;
+                prizesLeft[previousDrawn] += 1;
                 drawnCount--;
                 localStorage.setItem('drawnCount', drawnCount);
                 updateDrawnCountDisplay();
@@ -630,7 +630,7 @@ function closePrizeModal() {
             if (confirm("確定要清空所有獎項嗎？此操作無法復原！")) {
                 prizes = [];
                 historyRecords = [];
-                drawncount = 0;
+                drawnCount = 0;
                 localStorage.removeItem("prizes"); // 移除本地存儲中的獎項
                 localStorage.removeItem("historyRecords");
                 localStorage.setItem('drawnCount', 0);

@@ -6,7 +6,7 @@ body {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    background-color: #f4f4f4;
+    background-color: #fffcd2;
     /* padding-top: 120px; 假設 header 的高度為 120px */
     box-sizing: border-box;
 }
@@ -97,6 +97,30 @@ body {
     font-size: 40px;
     max-height: 80vh; /* 限制彈窗的最大高度 */
     overflow-y: auto; /* 如果內容超過高度限制，則顯示滾動條 */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.btn-confirm {
+    background-color: #FF3A3D;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 40px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 50px;
+}
+
+.btn-confirm:hover {
+    background-color: #d00;
+}
+
+.image-confirm {
+    width: 100%; /* 抽籤圖片的寬度 */
+    height: auto;
+    margin-top: 0%;
+    position: relative;
+    display: flex;  /* 去掉圖片周圍的額外間距 */
 }
 
 /* 關閉按鈕樣式 */

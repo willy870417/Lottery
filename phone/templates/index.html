@@ -52,15 +52,25 @@
     </div>
 
     <!-- 抽中獎項的彈出視窗 -->
+    <!-- 第一個彈窗：恭喜中獎 -->
     <div id="draw-modal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeDrawModal()">&times;</span>
-            <h3>恭喜!</h3>
-            <div id="draw-result">
-                <!-- 抽中獎項的內容會在此更新 -->
-            </div>
+            <img src="{{ url_for('static', filename='images/congratulations.jfif') }}" alt="中獎圖標" class="image-confirm">
+            <h3>恭喜抽中<br>
+            <span id="prize-name"></span>!!</h3>
+            <button class="btn-confirm" onclick="showConfirmPrizeModal()">立即領取</button>
         </div>
     </div>
+
+    <!-- 第二個彈窗：確認領獎 -->
+    <div id="confirm-prize-modal" class="modal">
+        <div class="modal-content">
+            <h2>確認領獎</h2>
+            <p>請確認您已領取獎項</p>
+            <button class="btn-confirm" onclick="closeConfirmPrizeModal()">確認</button>
+        </div>
+    </div>
+
 
     <!-- 歷史紀錄彈窗 -->
     <div id="history-modal" class="modal">
@@ -93,7 +103,7 @@
             const drawSound = document.getElementById("draw-sound");
             drawSound.play();
 
-            // 添加 unclickable 類別到所有按鈕，防止操作
+            // 禁用所有按鈕，防止多次操作
             const allButtons = document.querySelectorAll(".ticket");
             allButtons.forEach(btn => btn.classList.add("unclickable"));
 
@@ -111,42 +121,54 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.error) {
+                            // 如果有錯誤，顯示錯誤訊息
                             document.getElementById("result").textContent = data.error;
                         } else {
-                            // 更新按鈕為抽中的獎項
+                            // 更新按鈕顯示為抽中的獎品
                             button.textContent = data.prize;
 
                             // 將抽中的按鈕加上已抽中的類別
                             button.classList.add("opened");
-                            // 顯示抽獎結果
-                            document.getElementById("draw-result").innerHTML = `<p>您抽中了：${data.prize}</p>`;
-                            showDrawModal(); // 顯示彈窗
-                            
+
+                            // 顯示抽獎結果彈窗
+                            showDrawModal(data.prize); // 顯示彈窗，帶入獎品名稱
+
                             // 更新歷史紀錄和剩餘獎品
-                            addHistoryRecord(data.prize);
-                            updateRemaining(data.remaining);
+                            addHistoryRecord(data.prize); // 添加到抽獎歷史記錄
+                            updateRemaining(data.remaining); // 更新剩餘獎品數量
                         }
                     })
+                    // .catch(error => {
+                    //     console.error("抽獎失敗：", error);
+                    //     document.getElementById("result").textContent = "抽獎失敗，請稍後再試。";
+                    // })
                     .finally(() => {
-                        // 移除 unclickable 類別，只啟用未抽中的按鈕
+                        // 恢復未抽中的按鈕可用狀態
                         allButtons.forEach(btn => {
                             if (!btn.classList.contains("opened")) {
                                 btn.classList.remove("unclickable");
                             }
                         });
                     });
-            }, 1000); // 延遲 1 秒（與旋轉動畫時間一致）
+            }, 1000); // 延遲 1 秒，與旋轉動畫時間一致
         }
 
-
-        function showDrawModal() {
+        function showDrawModal(prize) {
+            // 更新第一個彈窗內容
+            document.getElementById("prize-name").textContent = prize;
             document.getElementById("draw-modal").style.display = "flex";
         }
 
-        function closeDrawModal() {
+        function showConfirmPrizeModal() {
+            // 關閉第一個彈窗，顯示第二個彈窗
             document.getElementById("draw-modal").style.display = "none";
+            document.getElementById("confirm-prize-modal").style.display = "flex";
         }
 
+        function closeConfirmPrizeModal() {
+            // 關閉第二個彈窗
+            document.getElementById("confirm-prize-modal").style.display = "none";
+        }
         function updateRemaining(remaining) {
             const remainingDiv = document.getElementById("remaining");
             remainingDiv.innerHTML = "<h3>剩餘獎品</h3>";

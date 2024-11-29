@@ -1,9 +1,10 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import send_from_directory
 import json
 import random
 import os
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 DATA_FILE = 'progress.json'
 HISTORY_FILE = 'history.json'
 
@@ -22,6 +23,10 @@ def load_data():
 def save_data(data):
     with open(DATA_FILE, 'w') as f:
         json.dump(data, f)
+
+@app.route('/manifest.json')
+def manifest():
+    return send_from_directory('static', 'manifest.json', mimetype='application/json')
 
 @app.route('/save_settings', methods=['POST'])
 def save_settings():

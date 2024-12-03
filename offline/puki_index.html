@@ -80,19 +80,9 @@
 }
 #prizes {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); 
+    grid-template-columns: repeat(3, 1fr); /* 一行 3 列 */
     gap: 16px; /* 卡片之间的间距 */
   }
-  @media (max-width: 800px) {
-    #prizes {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-@media (max-width: 500px) {
-    #prizes {
-        grid-template-columns: repeat(2, 1fr); /* 屏幕宽度小于 768px 时，一行 2 列 */
-    }
-}
 
     </style>
 <script>
@@ -173,12 +163,12 @@ function closePrizeModal() {
     }
   </script>
 </head>
-<body class="bg-[#FFFCD2] flex flex-col relative h-screen max-h-screen overflow-hidden">
+<body class="bg-gray-100 flex flex-col relative h-screen max-h-screen overflow-hidden">
     <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40"></div>
 
     <!-- 標題 -->
     <div class="flex justify-center">
-        <img src="header_cb.png" style="width: auto; height: auto; max-width: 100%; max-height: 100%;">
+        <img src="header_puki.png" style="width: auto; height: auto; max-width: 100%; max-height: 100%;">
     </div>
 
     <div class="flex justify-end w-full py-2 pr-6">
@@ -189,19 +179,20 @@ function closePrizeModal() {
     
 
     <!-- 側選單 -->
-    <div id="side-menu" class="fixed top-0 left-0 h-full w-1/3 bg-[#E68D19] shadow-lg transform -translate-x-full transition-transform duration-300 z-50">
-        <div class="p-4 mt-12 w-full">
-            <button id="setup-button" class="text-white px-4 py-2 border-b border-b-white w-full mb-4">設定獎項</button>
-            <button id="undo-button" class="text-white px-4 py-2 border-b border-b-white	w-full mb-4">回朔前一支籠</button>
-            <button id="history-button" class="text-white px-4 py-2 border-b border-b-white w-full mb-4">查看抽獎歷史</button>
-            <button id="remaining-button" class="text-white px-4 py-2 border-b border-b-white w-full mb-4">查看剩餘獎項</button>
-            <button id="clear-button" class="text-white px-4 py-2 border-b border-b-white w-full mb-4">清空獎項</button>
+    <div id="side-menu" class="fixed top-0 left-0 h-full w-64 bg-white shadow-lg transform -translate-x-full transition-transform duration-300 z-50">
+        <div class="p-4">
+            <h2 class="text-2xl font-semibold mb-6">選單</h2>
+            <button id="setup-button" class="bg-blue-500 text-white px-4 py-2 rounded shadow-md hover:bg-blue-600 w-full mb-4">設定獎項</button>
+            <button id="undo-button" class="bg-purple-500 text-white px-4 py-2 rounded shadow-md hover:bg-purple-600 w-full mb-4">回朔前一支籠</button>
+            <button id="history-button" class="bg-green-500 text-white px-4 py-2 rounded shadow-md hover:bg-green-600 w-full mb-4">查看抽獎歷史</button>
+            <button id="remaining-button" class="bg-yellow-500 text-white px-4 py-2 rounded shadow-md hover:bg-yellow-600 w-full mb-4">查看剩餘獎項</button>
+            <button id="clear-button" class="bg-red-500 text-white px-4 py-2 rounded shadow-md hover:bg-red-600 w-full mb-4">清空獎項</button>
         </div>
     </div>
 
     <!-- 獎品區域 -->
     <div class="w-full flex justify-center items-center">
-        <div id="prizes-container" class="md:mx-4 mx-8 flex justify-center items-center w-full">
+        <div id="prizes-container" class="mx-4 flex justify-center items-center w-full">
             <div id="prizes" class="grid grid-cols-3 gap-4 w-full max-w-screen-md">
             <!-- 卡片内容由 JavaScript 动态生成 -->
             </div>
@@ -210,35 +201,52 @@ function closePrizeModal() {
         <!-- 側選單按鈕 -->
             <button 
                 id="menu-toggle" 
-                class="absolute left-2 bottom-12 bg-gray-300 text-white p-4 rounded-full shadow-md opacity-90">
+                class="absolute left-2 bottom-28 bg-gray-300 text-white p-4 rounded-full shadow-md opacity-90">
             </button>
 
     <!-- 確認領取獎項彈窗 -->
     <div id="confirm-prize-modal" class="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
         <div
-          class="flex flex-col justify-start items-center w-3/5 max-w-md h-auto gap-6 px-4 py-8 rounded-[10px] bg-white shadow-xl" >
+          class="flex flex-col justify-start items-center w-4/5 max-w-md h-auto gap-6 px-4 py-8 rounded-lg bg-white shadow-xl" >
           <!-- 標題 -->
           <p class="text-4xl text-black mt-4">確認領獎</p>
       
           <!-- 圖標 -->
           <div class="flex items-center justify-center w-24 h-24">
-            <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M25 0C11.25 0 0 11.25 0 25C0 38.75 11.25 50 25 50C38.75 50 50 38.75 50 25C50 11.25 38.75 0 25 0ZM25 45C13.975 45 5 36.025 5 25C5 13.975 13.975 5 25 5C36.025 5 45 13.975 45 25C45 36.025 36.025 45 25 45ZM36.475 13.95L20 30.425L13.525 23.975L10 27.5L20 37.5L40 17.5L36.475 13.95Z" fill="#339F4E"/>
-            </svg>                
+            <svg
+            width="60"
+            height="60"
+            viewBox="0 0 60 60"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            class="flex-grow-0 flex-shrink-0 w-[60px] h-[60px] relative"
+            preserveAspectRatio="xMidYMid meet"
+          >
+            <path
+              d="M30 5C16.25 5 5 16.25 5 30C5 43.75 16.25 55 30 55C43.75 55 55 43.75 55 30C55 16.25 43.75 5 30 5ZM30 50C18.975 50 10 41.025 10 30C10 18.975 18.975 10 30 10C41.025 10 50 18.975 50 30C50 41.025 41.025 50 30 50ZM41.475 18.95L25 35.425L18.525 28.975L15 32.5L25 42.5L45 22.5L41.475 18.95Z"
+              fill="black"
+            ></path>
+          </svg>
+
           </div>
       
           <!-- 提示信息 -->
           <p class=" text-3xl text-center text-black">請確認您已領取獎項</p>
       
           <!-- 確認按鈕 -->
-          <button class="w-1/3 py-2 rounded bg-[#FF3A3D] text-white text-lg cursor-pointer hover:bg-gray-600 rounded-[5px]" onclick="closeConfirmPrizeModal()">確認</button>
+          <button
+            class="w-1/3 py-2 rounded bg-gray-500 text-white text-lg cursor-pointer hover:bg-gray-600"
+            onclick="closeConfirmPrizeModal()"
+          >
+            確認
+          </button>
         </div>
     </div>    
     
     <!-- 卡片旋轉 -->
     <div id="flip-card-modal" class="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
-        <div class="flip-card w-4/5 aspect-square mx-6">
-            <img src="button.jpg" alt="Rotating Image" class="w-full max-w-3/5 h-auto max-h-full object-contain rounded-[10px] shadow-xl">
+        <div class="flip-card w-full aspect-square mx-6">
+            <img src="ticket_puki.jpg" alt="Rotating Image" class="w-full max-w-full h-auto max-h-full object-contain rounded-[30px] shadow-xl">
         </div>
     </div>
 
@@ -249,14 +257,37 @@ function closePrizeModal() {
         <div class="relative mx-3 w-full max-w-md h-full max-h-[560px] rounded-[10px] bg-white flex flex-col items-center shadow-xl">
             <!-- 上半部分 -->
             <div class="w-full h-[40%] rounded-t-[10px] bg-[#d9d9d9]">
-                <img class="h-full rounded-t-[10px]" src="modal_header.png">
+                <img class="h-full" src="header_puki.png" alt="">
             </div>
           
             <!-- 獎品圖標 -->
             <div class="flex flex-col items-center mt-[-50px]">
-                <div class="relative flex items-center justify-center w-[100px] h-[100px]">
-                    <img src="modal_logo.png" class="rounded-full">
-                </div>
+              <div class="relative flex items-center justify-center w-[100px] h-[100px]">
+                <svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <linearGradient id="simple-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#FFD700" />
+                        <stop offset="50%" stop-color="#FFC300" />
+                        <stop offset="100%" stop-color="#B8860B" />
+                      </linearGradient>
+                    </defs>
+                    <circle cx="50" cy="50" r="50" fill="url(#simple-gold)" />
+                  </svg>                  
+                <svg
+                  width="60"
+                  height="60"
+                  viewBox="0 0 60 60"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  preserveAspectRatio="xMidYMid meet"
+                  class="absolute"
+                >
+                  <path
+                    d="M22.65 4.82505C17.925 4.80005 13.325 9.35005 15.425 15.0001H7.5C6.17392 15.0001 4.90215 15.5268 3.96447 16.4645C3.02678 17.4022 2.5 18.674 2.5 20.0001V25.0001C2.5 25.6631 2.76339 26.299 3.23223 26.7678C3.70107 27.2367 4.33696 27.5001 5 27.5001H27.5V20.0001H32.5V27.5001H55C55.663 27.5001 56.2989 27.2367 56.7678 26.7678C57.2366 26.299 57.5 25.6631 57.5 25.0001V20.0001C57.5 18.674 56.9732 17.4022 56.0355 16.4645C55.0979 15.5268 53.8261 15.0001 52.5 15.0001H44.575C47.5 6.82505 36.5 1.05005 31.425 8.10005L30 10.0001L28.575 8.05005C27 5.82505 24.825 4.85005 22.65 4.82505ZM22.5 10.0001C24.725 10.0001 25.85 12.7001 24.275 14.2751C22.7 15.8501 20 14.7251 20 12.5001C20 11.837 20.2634 11.2011 20.7322 10.7323C21.2011 10.2634 21.837 10.0001 22.5 10.0001ZM37.5 10.0001C39.725 10.0001 40.85 12.7001 39.275 14.2751C37.7 15.8501 35 14.7251 35 12.5001C35 11.837 35.2634 11.2011 35.7322 10.7323C36.2011 10.2634 36.837 10.0001 37.5 10.0001ZM5 30.0001V50.0001C5 51.3261 5.52678 52.5979 6.46447 53.5356C7.40215 54.4733 8.67392 55.0001 10 55.0001H50C51.3261 55.0001 52.5979 54.4733 53.5355 53.5356C54.4732 52.5979 55 51.3261 55 50.0001V30.0001H32.5V50.0001H27.5V30.0001H5Z"
+                    fill="black"
+                  ></path>
+                </svg>
+              </div>
             </div>
           
             <!-- 獎品名稱 -->
@@ -264,7 +295,7 @@ function closePrizeModal() {
             <p id="prize-name" class="mt-8 text-4xl font-medium text-black">飲料提袋!!</p>
           
             <!-- 領取按鈕 -->
-            <button class="shadow-md w-1/2 h-20 absolute bottom-[-32.5px] left-1/2 transform -translate-x-1/2 rounded-[10px] bg-[#FF3A3D] shadow-xl text-2xl font-semibold cursor-pointer text-white" onclick="closePrizeModal()">
+            <button class="w-2/3 h-20 absolute bottom-[-32.5px] left-1/2 transform -translate-x-1/2 rounded-[10px] bg-[#d9d9d9] border-2 border-white shadow-xl text-2xl font-semibold text-black cursor-pointer" onclick="closePrizeModal()">
               立即領取
             </button>
           </div>
@@ -272,7 +303,7 @@ function closePrizeModal() {
               
     <!-- 抽獎歷史彈窗 -->
     <div id="history-modal" class="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
-        <div class="h-[80%] w-[80%] modal-content bg-white rounded-[10px] shadow-lg p-6 overflow-y-auto">
+        <div class="h-[80%] w-[80%] modal-content bg-white rounded-lg shadow-lg p-6 overflow-y-auto">
             <h3 class="text-2xl font-semibold mb-4">抽獎歷史紀錄</h3>
             <ul id="history-list" class="list-disc list-inside text-gray-700"></ul>
             <button class="bg-red-500 text-white px-4 py-2 rounded shadow-md hover:bg-red-600 mt-4" onclick="closeHistoryModal()">關閉</button>
@@ -281,7 +312,7 @@ function closePrizeModal() {
 
     <!-- 剩餘獎項彈窗 -->
     <div id="remaining-modal" class="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
-        <div class="modal-content bg-white rounded-[10px] shadow-lg p-6 w-11/12 max-w-md">
+        <div class="modal-content bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-md">
             <h3 class="text-2xl font-semibold mb-4">剩餘獎項</h3>
             <div id="remaining-content" class="text-gray-700"></div>
             <button class="bg-red-500 text-white px-4 py-2 rounded shadow-md hover:bg-red-600 mt-4" onclick="closeRemainingModal()">關閉</button>
@@ -290,7 +321,7 @@ function closePrizeModal() {
 
     <!-- 設定獎項彈窗 -->
     <div id="setup-modal" class="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
-        <div class="modal-content bg-white rounded-[10px] shadow-lg p-6 w-11/12 max-w-md">
+        <div class="modal-content bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-md">
             <h3 class="text-2xl font-semibold mb-4">設定獎項</h3>
             <form id="setup-form" class="space-y-4">
                 <div id="prize-inputs">
@@ -360,9 +391,7 @@ function closePrizeModal() {
         let prizes = JSON.parse(localStorage.getItem("prizes")) || [];
         let historyRecords = JSON.parse(localStorage.getItem("historyRecords")) || [];
         let drawnCount = parseInt(localStorage.getItem('drawnCount')) || historyRecords.length;
-        updateDrawnCountDisplay();
-        let prizesLeft = JSON.parse(localStorage.getItem("prizesLeft")) || [];
-        let previousDrawn = historyRecords[historyRecords.length - 1]?.prize;
+        let previousDrawn = null;
 
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -375,14 +404,9 @@ function closePrizeModal() {
         function setupPrizes() {
             const prizesDiv = document.getElementById("prizes");
             prizesDiv.innerHTML = ""; // 清空內容
-            
-            let cardCount; // 定義在外部，使用 `let` 可以在後續賦值
-
-            // 設置顯示的卡片數量，根據裝置類型顯示 8, 9或 16 個卡片
-            if(window.innerWidth < 460) {cardCount = 8;}
-            else if(window.innerWidth > 460 && innerWidth < 769) {cardCount = 9;}
-            else {cardCount = 16}
-
+        
+            // 設置顯示的卡片數量，根據裝置類型顯示 8 或 16 個卡片
+            const cardCount = window.innerWidth < 460 ? 12 : 9;
         
             for (let i = 0; i < cardCount; i++) {
                 const card = document.createElement("div");
@@ -400,11 +424,11 @@ function closePrizeModal() {
         
                 // 卡片正面
                 const cardFront = document.createElement("div");
-                cardFront.className = "flip-card-front w-full max-w-full h-auto max-h-full object-contain rounded-[10px] shadow-xl";
+                cardFront.className = "flip-card-front w-full max-w-full h-auto max-h-full object-contain rounded-[30px] shadow-xl";
                 const img = document.createElement("img");
-                img.src = "button.jpg";
+                img.src = "ticket_puki.jpg";
                 img.alt = "抽獎按鈕圖片";
-                img.className = "w-full h-full object-contain rounded-[10px] shadow-xl";
+                img.className = "w-full h-full object-contain rounded-[30px] shadow-xl";
                 cardFront.appendChild(img);
         
                 // 卡片背面
@@ -433,20 +457,16 @@ function closePrizeModal() {
                 // 設置卡片背面顯示的獎項名稱
                 card.querySelector(".flip-card-back").textContent = prize;
                 card.classList.add("flipped");
-                
-                // 更新數據
-                drawnCount++;
-                prizesLeft[prize] -= 1;
         
                 // 更新歷史紀錄
                 const now = new Date().toLocaleString("zh-Hant", { hour12: false });
-                const drawnItem = {index: drawnCount, time: now, prize: prize };
+                const drawnItem = { time: now, prize: prize };
                 historyRecords.push(drawnItem);
-                
+                drawnCount++;
+        
                 // 更新本地存儲
                 localStorage.setItem("prizes", JSON.stringify(prizes));
                 localStorage.setItem("historyRecords", JSON.stringify(historyRecords));
-                localStorage.setItem("prizesLeft", JSON.stringify(prizesLeft));
                 localStorage.setItem("drawnCount", drawnCount);
         
                 updateDrawnCountDisplay();
@@ -476,7 +496,7 @@ function closePrizeModal() {
 
             historyRecords.forEach(record => {
                 const listItem = document.createElement("li");
-                listItem.textContent = `序：${record.index} 時間：${record.time} - 獎品：${record.prize}`;
+                listItem.textContent = `${record.time} - 獎品：${record.prize}`;
                 historyList.appendChild(listItem);
             });
 
@@ -488,18 +508,18 @@ function closePrizeModal() {
             document.getElementById("history-modal").classList.add("hidden");
         }
 
-		// 顯示剩餘獎項彈窗
-		document.getElementById("remaining-button").addEventListener("click", () => {
-    		const remainingContent = document.getElementById("remaining-content");
-    		remainingContent.innerHTML = ""; // 清空原有的剩餘內容
+        // 顯示剩餘獎項彈窗
+        document.getElementById("remaining-button").addEventListener("click", () => {
+            const remainingContent = document.getElementById("remaining-content");
+            remainingContent.innerHTML = ""; // 清空原有的剩餘內容
 
-    		// 使用 Object.entries() 遍歷 prizesLeft 物件
-    		Object.entries(prizesLeft).forEach(([key, value]) => {
-       			remainingContent.innerHTML += `<p>${key}: ${value} 個</p>`;
-    		});
+            prizes.forEach(prize => {
+                remainingContent.innerHTML += `<p>${prize.name}: ${prize.count} 個</p>`;
+            });
 
-    		document.getElementById("remaining-modal").classList.remove("hidden");
-		});
+            document.getElementById("remaining-modal").classList.remove("hidden");
+        });
+
         // 關閉剩餘獎項彈窗
         function closeRemainingModal() {
             document.getElementById("remaining-modal").classList.add("hidden");
@@ -546,25 +566,21 @@ function closePrizeModal() {
             const prizeCounts = document.querySelectorAll(".prize-count");
 
             prizes = [];
-            prizesLeft = {};
             prizeNames.forEach((input, index) => {
                 const name = input.value.trim();
                 const count = parseInt(prizeCounts[index].value, 10);
-                prizesLeft[name] = count;
-                
+
                 if (name && count > 0) {
                     for (let i = 0; i < count; i++) {
                         prizes.push(name);
                     }
                 }
             });
-            historyRecords = [];
-            drawnCount = 0;
+
             localStorage.setItem("prizes", JSON.stringify(prizes)); // 更新本地存儲
-            localStorage.setItem("prizesLeft", JSON.stringify(prizesLeft));
-            localStorage.setItem("historyRecords", JSON.stringify(historyRecords));
-            localStorage.setItem("drawnCount", 0); // 移除本地存儲中的歷史紀錄
+            localStorage.removeItem("drawnCount"); // 移除本地存儲中的歷史紀錄
             updateDrawnCountDisplay();
+            setupPrizes(); // 更新獎品顯示
             closeSetupModal(); // 關閉彈窗
         });
 
@@ -581,16 +597,18 @@ function closePrizeModal() {
 
         function confirmUndoDraw() {
             if (previousDrawn) {
-                prizes.push(previousDrawn);
-                historyRecords.pop();
-                prizesLeft[previousDrawn] += 1;
-                drawnCount--;
-                localStorage.setItem('drawnCount', drawnCount);
-                updateDrawnCountDisplay();
-                localStorage.setItem("prizes", JSON.stringify(prizes));
-                localStorage.setItem("historyRecords", JSON.stringify(historyRecords));
-                alert(`已成功回朔${previousDrawn}`);
-                previousDrawn = historyRecords[historyRecords.length-1].prize;
+                const prizeIndex = prizes.findIndex(prize => prize.name === previousDrawn.prize);
+                if (prizeIndex !== -1) {
+                    prizes[prizeIndex].count++;
+                    historyRecords.pop();
+                    drawnCount--;
+                    localStorage.setItem('drawnCount', drawnCount);
+                    updateDrawnCountDisplay();
+                    localStorage.setItem("prizes", JSON.stringify(prizes));
+                    localStorage.setItem("historyRecords", JSON.stringify(historyRecords));
+                    setupPrizes();
+                    previousDrawn = null;
+                }
             }
             closeUndoModal();
         }
@@ -600,7 +618,6 @@ function closePrizeModal() {
             if (confirm("確定要清空所有獎項嗎？此操作無法復原！")) {
                 prizes = [];
                 historyRecords = [];
-                drawnCount = 0;
                 localStorage.removeItem("prizes"); // 移除本地存儲中的獎項
                 localStorage.removeItem("historyRecords");
                 localStorage.setItem('drawnCount', 0);
@@ -611,13 +628,13 @@ function closePrizeModal() {
 
         // 點擊彈窗外部關閉彈窗
         window.addEventListener("click", (e) => {
-            const prizeModal = document.getElementById("prize-modal");
+            const flipCardModal = document.getElementById("flip-card-modal");
             const setupModal = document.getElementById("setup-modal");
             const historyModal = document.getElementById("history-modal");
             const remainingModal = document.getElementById("remaining-modal");
-            
-            if (e.target === prizeModal) {
-                closePrizeModal();
+
+            if (e.target === flipCardModal) {
+                closeFlipCardModal();
             }
             if (e.target === setupModal) {
                 closeSetupModal();
@@ -633,5 +650,13 @@ function closePrizeModal() {
         // 初始化
         document.addEventListener("DOMContentLoaded", setupPrizes);
     </script>
+  
+<script>
+    window.addEventListener('resize', () => {
+        document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+      });
+    document.addEventListener('DOMContentLoaded', setupPrizes);
+
+</script>
 </body>
 </html>

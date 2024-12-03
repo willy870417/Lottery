@@ -12,41 +12,40 @@
 
 </head>
 <body>
-    <!-- 左下角的圓形按鈕     -->
-    <button id="sidebar-toggle" onclick="toggleSidebar()">☰</button>
-
-    <!-- 側邊欄 -->
-    <div id="sidebar" class="sidebar">
-        <span class="close-sidebar" onclick="toggleSidebar()">×</span>
-        <a href="{{ url_for('setup') }}" class="sidebar-link">設定獎項</a>
-        <div class="sidebar-separator"></div>
-        <a onclick="confirmUndo()" class="sidebar-link">回朔前一支籤</a>
-        <div class="sidebar-separator"></div>
-        <a onclick="openRemainingModal()" class="sidebar-link">查看剩餘獎項</a>
-        <div class="sidebar-separator"></div>
-        <a onclick="showHistory()" class="sidebar-link">查看抽獎歷史</a>
-        <div class="sidebar-separator"></div>
-        <a onclick="clearHistory()" class="sidebar-link">清除歷史紀錄</a>
-    </div>
-
     <div class="header">
-        <div class="header-container">
-            <img src="{{ url_for('static', filename='images/header.png') }}" alt="抽獎系統標題" class="header-image">
+        <h1>抽獎系統</h1>
+        <a href="{{ url_for('setup') }}" class="setup-button">前往設定畫面</a>
+        <!-- 剩餘獎品按鈕 -->
+        <button id="remaining-button" class="remaining-button" onclick="openRemainingModal()">查看剩餘獎品</button>
+
+        <!-- 歷史紀錄按鈕，放在右下角 -->
+        <button id="history-btn" onclick="showHistory()">歷史紀錄</button>
+
+        <!-- 回朔功能按鈕 -->
+        <button id="undo-btn" onclick="confirmUndo()">回朔</button>
+
+        <!-- 歷史紀錄彈窗 -->
+        <div id="history-modal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeHistory()">&times;</span>
+                <h2>抽獎紀錄</h2>
+                <ul id="history-list">
+                    <!-- 抽獎紀錄項目將在這裡動態插入 -->
+                </ul>
+            </div>
         </div>
     </div>
 
-    <!-- 音效 -->
-    <audio id="draw-sound"></audio>
-
+    
+    
     <div id="prizes-container">
         {% if prizes %}
             <div id="prizes">
                 {% for prize in prizes %}
-                    {% if loop.index <= 12 %}
-                        <button class="ticket" onclick="drawPrize(this)">
-                            <img src="{{ url_for('static', filename='images/ticket.png') }}" alt="抽籤圖標" class="ticket-image">
-                        </button>
-                    {% endif %}
+                    <button class="ticket" onclick="drawPrize(this)">
+                        <!-- {{ loop.index }} -->
+                        <img src="{{ url_for('static', filename='images/ticket.png') }}" alt="抽籤圖標">
+                    </button>
                 {% endfor %}
             </div>
             <div id="result"></div>
@@ -54,46 +53,7 @@
             <p>請先設置獎品後再進行抽獎。</p>
         {% endif %}
     </div>
-    
 
-    <!-- 抽中獎項的彈出視窗 -->
-    <!-- 第一個彈窗：恭喜中獎 -->
-    <div id="draw-modal" class="modal">
-        <div class="modal-content-ticket">
-            <img src="{{ url_for('static', filename='images/congratulations.jfif') }}" alt="中獎圖標" class="image-confirm">
-            <img src="{{ url_for('static', filename='images/gift.png') }}" alt="禮物圖標" class="image-gift">
-            <h3><br>恭喜抽中<br>
-            <span id="prize-name"></span>!!<br></h3>
-            <button class="btn-confirm" onclick="showConfirmPrizeModal()">立即領取</button>
-        </div>
-    </div>
-
-    <!-- 第二個彈窗：確認領獎 -->
-    <div id="confirm-prize-modal" class="modal">
-        <div class="modal-content-confirm">
-            <h2>確認領獎<br></h2>
-            <img src="{{ url_for('static', filename='images/check.png') }}" alt="打勾" class="image-check">
-            <p>請確認您已領取獎項</p>
-            <button class="btn-confirm-2" onclick="closeConfirmPrizeModal()">確認</button>
-        </div>
-    </div>
-
-
-    <!-- 歷史紀錄彈窗 -->
-    <div id="history-modal" class="modal">
-        <div class="modal-content">
-            <img src="{{ url_for('static', filename='images/header.png') }}" alt="Header Image" class="modal-header-image">
-            <span class="close" onclick="closeHistory()">< 返回</span>
-            <h2>抽獎紀錄</h2>
-            <ul id="history-list"></ul>
-            <div class="pagination">
-                <button id="prev-page" onclick="prevPage()"><</button>
-                <span id="page-info"></span>
-                <button id="next-page" onclick="nextPage()">></button>
-            </div>
-        </div>
-    </div>
-    
     <!-- 剩餘獎品的彈出視窗 -->
     <div id="remaining-modal" class="modal">
         <div class="modal-content">
@@ -107,79 +67,41 @@
     </div>
 
     <script>
-        let historyRecords = []; // 儲存歷史紀錄的陣列
-        const initialRemaining = {{ remaining | tojson }}; 
+        const initialRemaining = {{ remaining | tojson }};
+        
+        // 抽獎彈窗開關狀態
+        let isPopupEnabled = document.getElementById("toggle-draw-popup").checked;
 
-        // let currentSoundIndex = 0; // 開始從第一首音效
+        // 當開關狀態改變時更新 isPopupEnabled
+        document.getElementById("toggle-draw-popup").addEventListener("change", function() {
+            isPopupEnabled = this.checked;
+        });
 
         function drawPrize(button) {
-            const ticketImage = button.querySelector(".ticket-image");
-
-            // 播放抽獎音效
-            const drawSound = document.getElementById("draw-sound");
-            if(!drawSound.paused){
-                drawSound.pause();
-                drawSound.currentTime = 0;
-            }
-            // let SoundsNum = 2
-            // if(currentSoundIndex == 0){
-            //     drawSound.src="{{ url_for('static', filename='sounds/draw1.wav') }}"
-            // }
-            // else if(currentSoundIndex == 1){
-            //     drawSound.src="{{ url_for('static', filename='sounds/draw2.wav') }}"
-            // }
-            drawSound.src="{{ url_for('static', filename='sounds/draw1.wav') }}"
-            drawSound.play();
-            // currentSoundIndex = (currentSoundIndex + 1) % SoundsNum
-
-            // 禁用所有按鈕，防止多次操作
-            const allButtons = document.querySelectorAll(".ticket");
-            allButtons.forEach(btn => btn.classList.add("unclickable"));
-
-            // 1. 添加旋轉動畫
-            ticketImage.classList.add("rotate");
-
-            // 2. 等待旋轉動畫結束後執行後續操作
-            setTimeout(() => {
-                // 移除旋轉動畫，添加打開動畫
-                ticketImage.classList.remove("rotate");
-                ticketImage.classList.add("open");
-
-                // 3. 執行抽獎邏輯
-                fetch("{{ url_for('draw') }}", { method: "POST" })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.error) {
-                            // 如果有錯誤，顯示錯誤訊息
-                            document.getElementById("result").textContent = data.error;
-                        } else {
-                            // 更新按鈕顯示為抽中的獎品
-                            button.textContent = data.prize;
-
-                            // 將抽中的按鈕加上已抽中的類別
-                            button.classList.add("opened");
-
-                            // 顯示抽獎結果彈窗
-                            showDrawModal(data.prize); // 顯示彈窗，帶入獎品名稱
-
-                            // 更新歷史紀錄和剩餘獎品
-                            addHistoryRecord(`獎品：${data.prize}`); // 添加到抽獎歷史記錄
-                            updateRemaining(data.remaining); // 更新剩餘獎品數量
+            fetch("{{ url_for('draw') }}", { method: "POST" })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById("result").textContent = data.error;
+                    } else {
+                        button.textContent = data.prize;
+                        button.disabled = true;
+                        
+                        // 更新抽中的獎項顯示在彈窗中
+                        document.getElementById("draw-result").innerHTML = `<p>您抽中了：${data.prize}</p>`;
+                        
+                        // 檢查開關是否開啟彈窗
+                        if (isPopupEnabled) {
+                            showDrawModal(); // 顯示抽獎結果彈窗
                         }
-                    })
-                    // .catch(error => {
-                    //     console.error("抽獎失敗：", error);
-                    //     document.getElementById("result").textContent = "抽獎失敗，請稍後再試。";
-                    // })
-                    .finally(() => {
-                        // 恢復未抽中的按鈕可用狀態
-                        allButtons.forEach(btn => {
-                            if (!btn.classList.contains("opened")) {
-                                btn.classList.remove("unclickable");
-                            }
-                        });
-                    });
-            }, 3000); // 延遲 1 秒，與旋轉動畫時間一致
+
+                        // 新增歷史紀錄
+                        addHistoryRecord(data.prize);
+                        
+                        // 更新剩餘獎品數量
+                        updateRemaining(data.remaining);
+                    }
+                });
         }
 
         function showDrawModal(prize) {
@@ -191,16 +113,9 @@
         function showConfirmPrizeModal() {
             // 關閉第一個彈窗，顯示第二個彈窗
             document.getElementById("draw-modal").style.display = "none";
-            document.getElementById("confirm-prize-modal").style.display = "flex";
         }
 
-        function closeConfirmPrizeModal() {
-            // 關閉第二個彈窗
-            document.getElementById("confirm-prize-modal").style.display = "none";
 
-            // 重新整理頁面
-            location.reload();
-        }
 
         function updateRemaining(remaining) {
             const remainingDiv = document.getElementById("remaining");
@@ -243,83 +158,27 @@
         // 抽獎後，新增紀錄
         function addHistoryRecord(prize) {
             const now = new Date();
-            const timeString = now.toLocaleTimeString('zh-Hant', { hour12: false });
-            const record = `${timeString}, ${prize}`;
-
-            // 新增紀錄到歷史紀錄陣列
-            historyRecords.push(record);
-
-            fetch('/add_history', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ record }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data.message); // 顯示更新訊息
-                updateHistoryList(); // 更新列表
-            });
+            const timeString = now.toLocaleTimeString('zh-Hant', { hour12: false }); // 格式化為 24 小時制
+            const record = `${timeString}, 獎品：${prize}`;
+            
+            historyRecords.unshift(record); // 加入到歷史紀錄陣列的開頭
+            updateHistoryList(); // 更新彈窗的顯示
         }
 
-        let currentPage = 1; // 當前頁數
-        const recordsPerPage = 15; // 每頁顯示的紀錄數量
-
-        // 更新歷史紀錄列表（分頁顯示）
+        // 更新彈窗中的歷史紀錄列表
         function updateHistoryList() {
-            fetch('/get_history') // 從伺服器獲取歷史紀錄
-                .then(response => response.json())
-                .then(history => {
-                    const historyList = document.getElementById('history-list');
-                    historyList.innerHTML = ""; // 清空原有內容
+            const historyList = document.getElementById('history-list');
+            historyList.innerHTML = ""; // 清空原有的列表內容
 
-                    const totalPages = Math.ceil(history.length / recordsPerPage); // 總頁數
-                    const start = (currentPage - 1) * recordsPerPage;
-                    const end = start + recordsPerPage;
-
-                    // 顯示當前頁的紀錄
-                    const pageRecords = history.slice(start, end);
-                    pageRecords.forEach(record => {
-                        const listItem = document.createElement('li');
-                        listItem.textContent = record;
-                        historyList.appendChild(listItem);
-                    });
-
-                    // 更新分頁按鈕狀態
-                    document.getElementById('prev-page').disabled = currentPage === 1;
-                    document.getElementById('next-page').disabled = currentPage === totalPages;
-
-                    // 更新分頁信息
-                    document.getElementById('page-info').textContent = 
-                        `${currentPage.toString().padStart(2, '0')}/${totalPages.toString().padStart(2, '0')}`;
-
-                });
-        }
-
-        // 上一頁
-        function prevPage() {
-            if (currentPage > 1) {
-                currentPage--;
-                updateHistoryList();
-            }
-        }
-
-        // 下一頁
-        function nextPage() {
-            fetch('/get_history')
-                .then(response => response.json())
-                .then(history => {
-                    const totalPages = Math.ceil(history.length / recordsPerPage);
-                    if (currentPage < totalPages) {
-                        currentPage++;
-                        updateHistoryList();
-                    }
-                });
+            historyRecords.forEach(record => {
+                const listItem = document.createElement('li');
+                listItem.textContent = record;
+                historyList.appendChild(listItem);
+            });
         }
 
         // 顯示歷史紀錄彈窗
         function showHistory() {
-            currentPage = 1; // 重置到第一頁
-            updateHistoryList(); // 更新列表
             document.getElementById('history-modal').style.display = 'flex';
         }
 
@@ -353,9 +212,6 @@
                         if (data.error) {
                             alert(data.error);
                         } else {
-                            // 回朔成功後加入回朔紀錄，包含回朔的獎品
-                            const record = `***回朔獎品：${data.undo_prize}***`;
-                            addHistoryRecord(record); // 儲存回朔紀錄
                             alert(data.message);
                             location.reload(); // 回朔成功後重新載入頁面
                         }
@@ -369,53 +225,6 @@
                 alert("回朔已取消");
             }
         }
-
-
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById("sidebar");
-            const allButtons = document.querySelectorAll(".ticket");
-
-            if (sidebar.classList.contains("open-sidebar")) {
-                // 側邊欄目前是開啟狀態，執行關閉
-                sidebar.classList.remove("open-sidebar");
-                sidebar.style.left = "-100%"; // 隱藏側邊欄
-
-                // 允許開啟新籤
-                allButtons.forEach(btn => btn.classList.remove("unclickable"));
-            } else {
-                // 側邊欄目前是關閉狀態，執行打開
-                sidebar.classList.add("open-sidebar");
-                sidebar.style.left = "0"; // 顯示側邊欄
-
-                // 禁止開啟新籤
-                allButtons.forEach(btn => btn.classList.add("unclickable"));
-            }
-        }
-
-        // 點擊側邊欄以外的區域自動關閉側邊欄
-        document.addEventListener("click", function (event) {
-            const sidebar = document.getElementById("sidebar");
-            const toggleButton = document.getElementById("sidebar-toggle");
-
-            // 確認點擊區域是否在側邊欄內或開啟按鈕上
-            if (!sidebar.contains(event.target) && event.target !== toggleButton) {
-                if (sidebar.classList.contains("open-sidebar")) {
-                    toggleSidebar(); // 關閉側邊欄
-                }
-            }
-        });
-
-        // 點擊側邊欄按鈕時自動關閉側邊欄
-        const sidebarLinks = document.querySelectorAll(".sidebar-link");
-        sidebarLinks.forEach((link) => {
-            link.addEventListener("click", function () {
-                const sidebar = document.getElementById("sidebar");
-                if (sidebar.classList.contains("open-sidebar")) {
-                    toggleSidebar(); // 關閉側邊欄
-                }
-            });
-        });
 
     </script>
 </body>

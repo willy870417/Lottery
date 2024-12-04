@@ -1,3 +1,8 @@
+input::placeholder {
+    color: #ccc; /* 設定更淺的顏色 */
+    opacity: 1;   /* 確保顏色的可見度 (預設可能較低) */
+}
+
 /* 設置頁面布局 */
 body {
     font-family: Arial, sans-serif;
@@ -195,12 +200,12 @@ body-setup {
     padding: 0px;
     border-radius: 15px;
     width: 100%;
-    max-width: 800px;
+    max-width: 900px;
     height: 100%;
-    max-height: 500px;
+    max-height: 600px;
     text-align: center;
     position: relative;
-    font-size: 40px;
+    font-size: 45px;
     overflow: visible; /* 允許內容（例如按鈕）超出彈窗範圍 */
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     display: flex; /* 啟用 Flexbox */
@@ -235,7 +240,7 @@ body-setup {
     color: #F79414;
     text-decoration: none;
     border-radius: 5px;
-    font-size: 0.8em; /* 調整字體大小 */
+    font-size: 30px; /* 調整字體大小 */
     text-align: center;
     z-index: 10; /* 確保按鈕在圖片之上 */
 }
@@ -371,17 +376,18 @@ button[type="button"], button[type="submit"], button[type="back"] {
 }
 
 /* 刪除按鈕樣式 */
-button[type="delete_button"] {
+.delete_button{
     background-color: #f44336;
     color: white;
     border: none;
     padding: 10px 10px; /* 放大按鈕 */
     border-radius: 8px;
     cursor: pointer;
-    font-size: 0.55em;
-    width: 60px;
-    height: 60px;
+    font-size: 30px;
+    width: 40px;
+    height: 40px;
     margin-left: 20px;
+    text-align: center;
 }
 
 button[type="delete_button"]:hover {
@@ -484,22 +490,6 @@ button[type="submit"] {
     justify-content: center; /* 水平置中排列 */
     gap: 10px; /* 按鈕之間的間距 */
     margin-top: 20px; /* 上方的間距 */
-}
-
-button[type="back"] {
-    display: block;
-    position: absolute; /* 使用絕對定位 */
-    top: 18%; /* 位於 header 的下方，加 10px 間距 */
-    left: 0px; /* 距離左邊 20px */
-    padding: 15px 30px;
-    width: auto; /* 適應內容寬度 */
-    background-color: #ffffff00;
-    color: #F79414;
-    text-decoration: none;
-    border-radius: 5px;
-    font-size: 0.7em; /* 調整字體大小 */
-    text-align: center;
-    z-index: 10; /* 確保按鈕在圖片之上 */
 }
 
 .back-button:hover {
@@ -655,6 +645,7 @@ button[type="back"] {
     background-color: #E68D19; /* 背景顏色，確保側邊欄可見 */
     color: #fff; /* 文字顏色 */
     padding: 20px; /* 內邊距 */
+    padding-top: 10%;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5); /* 增加陰影效果 */
     transition: left 0.3s ease;
     z-index: 2000; /* 層級，確保在其他元素之上 */
@@ -681,12 +672,25 @@ button[type="back"] {
     display: block; /* 使連結呈現為塊狀 */
     color: #fff; /* 字體顏色 */
     text-decoration: none; /* 去除底線 */
-    font-size: 18px; /* 字體大小 */
+    font-size: 30px; /* 字體大小 */
     padding: 10px 15px; /* 內邊距 */
     background-color: #44444400; /* 背景色 */
     text-align: center; /* 文字置中 */
     cursor: pointer; /* 滑鼠變成手型 */
     margin: 0; /* 去除外距 */
+}
+
+.sidebar-link-bottom {
+    display: block; /* 使連結呈現為塊狀 */
+    color: #fff; /* 字體顏色 */
+    text-decoration: none; /* 去除底線 */
+    font-size: 30px; /* 字體大小 */
+    padding: 10px 15px; /* 內邊距 */
+    background-color: #44444400; /* 背景色 */
+    text-align: center; /* 文字置中 */
+    cursor: pointer; /* 滑鼠變成手型 */
+    margin: 0; /* 去除外距 */
+    margin-top: 310%;
 }
 
 /* 分隔線樣式 */

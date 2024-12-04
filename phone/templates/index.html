@@ -7,17 +7,17 @@
     <meta name="theme-color" content="#ffffff">
     <title>抽獎系統</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-
-
-
 </head>
+
 <body>
     <!-- 左下角的圓形按鈕     -->
     <button id="sidebar-toggle" onclick="toggleSidebar()">☰</button>
 
     <!-- 側邊欄 -->
     <div id="sidebar" class="sidebar">
-        <span class="close-sidebar" onclick="toggleSidebar()">×</span>
+        <!-- <span class="close-sidebar" onclick="toggleSidebar()">X</span> -->
+        <a href="{{ url_for('index') }}" class="sidebar-link">首頁</a>
+        <div class="sidebar-separator"></div>
         <a href="{{ url_for('setup') }}" class="sidebar-link">設定獎項</a>
         <div class="sidebar-separator"></div>
         <a onclick="confirmUndo()" class="sidebar-link">回朔前一支籤</a>
@@ -25,8 +25,8 @@
         <a onclick="openRemainingModal()" class="sidebar-link">查看剩餘獎項</a>
         <div class="sidebar-separator"></div>
         <a onclick="showHistory()" class="sidebar-link">查看抽獎歷史</a>
-        <div class="sidebar-separator"></div>
-        <a onclick="clearHistory()" class="sidebar-link">清除歷史紀錄</a>
+        
+        <a onclick="clearHistory()" class="sidebar-link-bottom">清除歷史紀錄</a>
     </div>
 
     <div class="header">
@@ -64,7 +64,7 @@
             <img src="{{ url_for('static', filename='images/gift.png') }}" alt="禮物圖標" class="image-gift">
             <h3><br>恭喜抽中<br>
             <span id="prize-name"></span>!!<br></h3>
-            <button class="btn-confirm" onclick="showConfirmPrizeModal()">立即領取</button>
+            <button class="btn-confirm" onclick="showConfirmPrizeModal(document.getElementById('prize-name').textContent)">立即領取</button>
         </div>
     </div>
 
@@ -73,7 +73,7 @@
         <div class="modal-content-confirm">
             <h2>確認領獎<br></h2>
             <img src="{{ url_for('static', filename='images/check.png') }}" alt="打勾" class="image-check">
-            <p>請確認您已領取獎項</p>
+            <p>請確認您已領取獎品：<span id="prize-name2"></span></p>
             <button class="btn-confirm-2" onclick="closeConfirmPrizeModal()">確認</button>
         </div>
     </div>
@@ -83,7 +83,8 @@
     <div id="history-modal" class="modal">
         <div class="modal-content">
             <img src="{{ url_for('static', filename='images/header.png') }}" alt="Header Image" class="modal-header-image">
-            <span class="close" onclick="closeHistory()">< 返回</span>
+            <!-- <span class="close" onclick="closeHistory()">< 返回</span> -->
+            <!-- <a class="close" href="{{ url_for('index') }}">< 返回</a> -->
             <h2>抽獎紀錄</h2>
             <ul id="history-list"></ul>
             <div class="pagination">
@@ -98,7 +99,8 @@
     <div id="remaining-modal" class="modal">
         <div class="modal-content">
             <img src="{{ url_for('static', filename='images/header.png') }}" alt="Header Image" class="modal-header-image">
-            <span class="close" onclick="closeRemainingModal()">< 返回</span>
+            <!-- <span class="close" onclick="closeRemainingModal()">< 返回</span> -->
+            <!-- <a class="close" href="{{ url_for('index') }}">< 返回</a> -->
             <h3>剩餘獎品</h3>
             <div id="remaining-content">
                 <!-- 剩餘獎品內容將在此更新 -->
@@ -188,9 +190,10 @@
             document.getElementById("draw-modal").style.display = "flex";
         }
 
-        function showConfirmPrizeModal() {
+        function showConfirmPrizeModal(prize) {
             // 關閉第一個彈窗，顯示第二個彈窗
             document.getElementById("draw-modal").style.display = "none";
+            document.getElementById("prize-name2").textContent = prize;
             document.getElementById("confirm-prize-modal").style.display = "flex";
         }
 
@@ -220,6 +223,7 @@
 
         // 剩餘獎品視窗的開關
         function openRemainingModal() {
+            closeHistory();
             document.getElementById("remaining-modal").style.display = "flex";
             fetch("{{ url_for('remaining') }}")
                 .then(response => response.json())
@@ -318,6 +322,7 @@
 
         // 顯示歷史紀錄彈窗
         function showHistory() {
+            closeRemainingModal();
             currentPage = 1; // 重置到第一頁
             updateHistoryList(); // 更新列表
             document.getElementById('history-modal').style.display = 'flex';
@@ -369,8 +374,6 @@
                 alert("回朔已取消");
             }
         }
-
-
 
         function toggleSidebar() {
             const sidebar = document.getElementById("sidebar");

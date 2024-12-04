@@ -5,8 +5,8 @@ import random
 import os
 
 app = Flask(__name__, static_folder='static')
-DATA_FILE = 'progress.json'
-HISTORY_FILE = 'history.json'
+DATA_FILE = './mnt/data/progress.json'
+HISTORY_FILE = './mnt/data/history.json'
 
 # 初始化 history.json（如果檔案不存在）
 if not os.path.exists(HISTORY_FILE):

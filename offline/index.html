@@ -238,7 +238,7 @@ function closePrizeModal() {
     <!-- 卡片旋轉 -->
     <div id="flip-card-modal" class="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
         <div class="flip-card w-4/5 aspect-square mx-6">
-            <img src="button.jpg" alt="Rotating Image" class="w-full max-w-3/5 h-auto max-h-full object-contain rounded-[10px] shadow-xl">
+            <img src="cb_ticket.jpg" alt="Rotating Image" class="w-full max-w-3/5 h-auto max-h-full object-contain rounded-[10px] shadow-xl">
         </div>
     </div>
 
@@ -272,10 +272,31 @@ function closePrizeModal() {
               
     <!-- 抽獎歷史彈窗 -->
     <div id="history-modal" class="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
-        <div class="h-[80%] w-[80%] modal-content bg-white rounded-[10px] shadow-lg p-6 overflow-y-auto">
-            <h3 class="text-2xl font-semibold mb-4">抽獎歷史紀錄</h3>
-            <ul id="history-list" class="list-disc list-inside text-gray-700"></ul>
-            <button class="bg-red-500 text-white px-4 py-2 rounded shadow-md hover:bg-red-600 mt-4" onclick="closeHistoryModal()">關閉</button>
+        <div class="h-[80%] w-[80%] modal-content bg-white rounded-[10px] shadow-lg p-6 flex flex-col">
+            <h3 class="text-2xl font-semibold mb-4 ">抽獎歷史紀錄</h3>
+            <div class="overflow-y-auto h-full">
+                <ul id="history-list" class="list-disc list-inside text-gray-700"></ul>
+            </div>
+            <div class="flex">
+                <button class="bg-red-500 text-white px-4 py-2 rounded shadow-md hover:bg-red-600 mt-4" onclick="closeHistoryModal()">關閉</button>
+                <div class="flex item-stretch justify-center">
+                    <button id="arrow_left" class="text-white px-1 py-2 rounded mt-4" onclick="">
+                        <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M42 25C42 34.4 34.4 42 25 42C15.6 42 8 34.4 8 25C8 15.6 15.6 8 25 8C34.4 8 42 15.6 42 25ZM10 25C10 33.3 16.7 40 25 40C33.3 40 40 33.3 40 25C40 16.7 33.3 10 25 10C16.7 10 10 16.7 10 25Z" fill="black"/>
+                            <path d="M26.7001 16.7L18.4001 25L26.7001 33.3L25.3001 34.7L15.6001 25L25.3001 15.2999L26.7001 16.7Z" fill="black"/>
+                            <path d="M17 26L17 24L34 24L34 26L17 26Z" fill="black"/>
+                        </svg>                        
+                    </button>
+                    <div id="history-pages" class=" flex"></div>
+                    <button id="arrow_left" class="text-white px-1 py-2 rounded mt-4" onclick="">
+                        <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 25C8 15.6 15.6 8 25 8C34.4 8 42 15.6 42 25C42 34.4 34.4 42 25 42C15.6 42 8 34.4 8 25ZM40 25C40 16.7 33.3 10 25 10C16.7 10 10 16.7 10 25C10 33.3 16.7 40 25 40C33.3 40 40 33.3 40 25Z" fill="black"/>
+                            <path d="M23.2999 33.3L31.5999 25L23.2999 16.7L24.6999 15.3L34.3999 25L24.6999 34.7L23.2999 33.3Z" fill="black"/>
+                            <path d="M33 24L33 26L16 26L16 24L33 24Z" fill="black"/>
+                        </svg>                                             
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -402,7 +423,7 @@ function closePrizeModal() {
                 const cardFront = document.createElement("div");
                 cardFront.className = "flip-card-front w-full max-w-full h-auto max-h-full object-contain rounded-[10px] shadow-xl";
                 const img = document.createElement("img");
-                img.src = "button.jpg";
+                img.src = "cb_ticket.jpg";
                 img.alt = "抽獎按鈕圖片";
                 img.className = "w-full h-full object-contain rounded-[10px] shadow-xl";
                 cardFront.appendChild(img);
@@ -473,6 +494,14 @@ function closePrizeModal() {
         document.getElementById("history-button").addEventListener("click", () => {
             const historyList = document.getElementById("history-list");
             historyList.innerHTML = ""; // 清空原有的歷史紀錄
+            const pages = document.getElementById("history-pages");
+            for(let i = 1; i < historyRecords.length/10; i++){
+                let temp = document.createElement("p");
+                temp.textContent = i;
+                temp.value = i;
+                temp.className = "mx-1 justify-center content-center mt-4";
+                pages.appendChild(temp);
+            }  
 
             historyRecords.forEach(record => {
                 const listItem = document.createElement("li");

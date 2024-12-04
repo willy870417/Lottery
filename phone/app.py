@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask import send_from_directory
 import json
@@ -184,7 +183,6 @@ def clear_history():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
-=======
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask import send_from_directory
 import json
@@ -365,5 +363,4 @@ def clear_history():
     return jsonify({'message': '歷史紀錄已清除'})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
->>>>>>> 61a9e696b7f05964a6e377d5243ff7a47c79eaba
+    app.run(host='0.0.0.0', port=8080, debug=True)

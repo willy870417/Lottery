@@ -1,2 +1,7 @@
+<<<<<<< HEAD
 Flask==2.3.2
 gunicorn==20.1.0
+=======
+Flask
+gunicorn
+>>>>>>> 2024-12-03

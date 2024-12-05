@@ -81,7 +81,7 @@
 #prizes {
     display: grid;
     grid-template-columns: repeat(4, 1fr); 
-    gap: 16px; /* 卡片之间的间距 */
+    gap: 10px; /* 卡片之间的间距 */
   }
   @media (max-width: 800px) {
     #prizes {
@@ -180,12 +180,6 @@ function closePrizeModal() {
     <div class="flex justify-center">
         <img src="header_cb.png" style="width: auto; height: auto; max-width: 100%; max-height: 100%;">
     </div>
-
-    <div class="flex justify-end w-full py-2 pr-6">
-        <div id="drawn-count" class="text-lg font-semibold">
-            已抽 0 個籤
-        </div>
-    </div>
     
 
     <!-- 側選單 -->
@@ -203,7 +197,7 @@ function closePrizeModal() {
     <!-- 獎品區域 -->
     <div class="w-full flex justify-center items-center">
         <div id="prizes-container" class="md:mx-4 mx-8 flex justify-center items-center w-full">
-            <div id="prizes" class="grid grid-cols-3 gap-4 w-full max-w-screen-md">
+            <div id="prizes" class="w-full max-w-screen-md">
             <!-- 卡片内容由 JavaScript 动态生成 -->
             </div>
         </div>
@@ -389,7 +383,7 @@ function closePrizeModal() {
         let prizes = JSON.parse(localStorage.getItem("prizes")) || [];
         let historyRecords = JSON.parse(localStorage.getItem("historyRecords")) || [];
         let drawnCount = parseInt(localStorage.getItem('drawnCount')) || historyRecords.length;
-        updateDrawnCountDisplay();
+        //updateDrawnCountDisplay();
         let prizesLeft = JSON.parse(localStorage.getItem("prizesLeft")) || [];
         let previousDrawn = historyRecords[historyRecords.length - 1]?.prize;
 
@@ -410,7 +404,7 @@ function closePrizeModal() {
             // 設置顯示的卡片數量，根據裝置類型顯示 8, 9或 16 個卡片
             if(window.innerWidth < 460) {cardCount = 8;}
             else if(window.innerWidth > 460 && innerWidth < 769) {cardCount = 9;}
-            else {cardCount = 16}
+            else {cardCount = 20}
 
         
             for (let i = 0; i < cardCount; i++) {
@@ -478,7 +472,7 @@ function closePrizeModal() {
                 localStorage.setItem("prizesLeft", JSON.stringify(prizesLeft));
                 localStorage.setItem("drawnCount", drawnCount);
         
-                updateDrawnCountDisplay();
+                //updateDrawnCountDisplay();
         
                 // 顯示抽獎結果彈窗
                 const drawSound = document.getElementById("draw-sound");
@@ -601,7 +595,7 @@ function closePrizeModal() {
             localStorage.setItem("prizesLeft", JSON.stringify(prizesLeft));
             localStorage.setItem("historyRecords", JSON.stringify(historyRecords));
             localStorage.setItem("drawnCount", 0); // 移除本地存儲中的歷史紀錄
-            updateDrawnCountDisplay();
+            //pdateDrawnCountDisplay();
             closeSetupModal(); // 關閉彈窗
         });
 
@@ -623,7 +617,7 @@ function closePrizeModal() {
                 prizesLeft[previousDrawn] += 1;
                 drawnCount--;
                 localStorage.setItem('drawnCount', drawnCount);
-                updateDrawnCountDisplay();
+                //updateDrawnCountDisplay();
                 localStorage.setItem("prizes", JSON.stringify(prizes));
                 localStorage.setItem("historyRecords", JSON.stringify(historyRecords));
                 alert(`已成功回朔${previousDrawn}`);
@@ -641,7 +635,7 @@ function closePrizeModal() {
                 localStorage.removeItem("prizes"); // 移除本地存儲中的獎項
                 localStorage.removeItem("historyRecords");
                 localStorage.setItem('drawnCount', 0);
-                updateDrawnCountDisplay();
+                //updateDrawnCountDisplay();
                 setupPrizes(); // 更新顯示
             }
         });

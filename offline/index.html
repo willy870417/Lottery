@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+    <title>抽獎系統</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        
+        .flip-card {
+            perspective: 1000px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%; /* 適應父容器 */
+            aspect-ratio: 1; /* 確保卡片是正方形 */
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 90%;
+            height: 90%;
+            transition: transform 1.0s;
+            transform-style: preserve-3d;
+            border-radius: 30px;
+        }
+
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 30px;
+        }
+
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+        /* 卡片旋轉動畫 */
+.rotate {
+    animation: rotateAnimation 1.0s ease-in-out forwards;
+}
+
+@keyframes rotateAnimation {
+    0% {
+        transform: rotateY(0deg); /* 起始狀態 */
+    }
+    100% {
+        transform: rotateY(1440deg); /* 旋轉 360 度 */
+    }
+}
+:root {
+    --vh: 1vh;
+  }
+  html,
+  body {
+    height: calc(var(--vh, 1vh) * 100);
+  }
+  
+/* 卡片透明動畫 */
+.open {
+    animation: openAnimation 0.9s ease-in-out forwards;
+}
+
+@keyframes openAnimation {
+    0% {
+        opacity: 1;
+        transform: scale(1); /* 初始大小 */
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.2); /* 放大並隱藏 */
+    }
+}
+#prizes {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 16px; /* 卡片之间的间距 */
+  }
+  @media (max-width: 800px) {
+    #prizes {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+@media (max-width: 500px) {
+    #prizes {
+        grid-template-columns: repeat(2, 1fr); /* 屏幕宽度小于 768px 时，一行 2 列 */
+    }
+}
+
+    </style>
+<script>
+        // 顯示確認領取獎項彈窗
+        function showConfirmPrizeModal() {
+            const modal = document.getElementById("confirm-prize-modal");
+            modal.classList.remove("hidden");
+        }
+
+        // 關閉確認領取獎項彈窗
+        function closeConfirmPrizeModal() {
+            const modal = document.getElementById("confirm-prize-modal");
+            modal.classList.add("hidden");
+            // 關閉翻開的卡片
+            document.querySelectorAll(".flip-card.flipped").forEach(card => {
+                card.classList.remove("flipped");
+            });
+        }
+
+// 顯示抽獎結果並帶有旋轉效果的彈窗
+function showFlipCardResult(prizeName) {
+    const modal = document.getElementById("flip-card-modal");
+    const flipCard = document.querySelector("#flip-card-modal .flip-card");
+
+    // 顯示翻牌窗口
+    modal.classList.remove("hidden");
+
+    // 添加旋轉動畫
+    flipCard.classList.add("rotate");
+
+    // 動畫完成後顯示抽獎結果窗口
+    setTimeout(() => {
+        modal.classList.add("hidden"); // 隱藏旋轉窗口
+        flipCard.classList.remove("rotate"); // 移除旋轉效果
+        showPrizeModal(prizeName); // 顯示抽獎結果
+    }, 1200); // 1.2秒後顯示結果
+}
+
+// 顯示獎品結果窗口
+function showPrizeModal(prizeName) {
+    const modal = document.getElementById("prize-modal");
+    const prizeNameElement = document.getElementById("prize-name");
+
+    // 動態更新獎品名稱
+    prizeNameElement.textContent = prizeName + "!!";
+
+    // 顯示結果視窗
+    modal.classList.remove("hidden");
+}
+
+// 關閉獎品結果窗口
+function closePrizeModal() {
+    const modal = document.getElementById("prize-modal");
+    modal.classList.add("hidden");
+    showConfirmPrizeModal();
+}
+      if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+              console.log('Service Worker registered with scope:', registration.scope);
+          }).catch(function(error) {
+              console.log('Service Worker registration failed:', error);
+          });
+      }
+  </script>
+  
+<style>
+        body {
+            touch-action: manipulation;
+        }
+    </style>
+<script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./service-worker.js').then(function(registration) {
+        console.log('Service Worker registered with scope:', registration.scope);
+      }).catch(function(error) {
+        console.log('Service Worker registration failed:', error);
+      });
+    }
+  </script>
+</head>
+<body class="bg-[#FFFCD2] flex flex-col relative h-screen max-h-screen overflow-hidden">
+    <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40"></div>
+
+    <!-- 標題 -->
+    <div class="flex justify-center">
+        <img src="header_cb.png" style="width: auto; height: auto; max-width: 100%; max-height: 100%;">
+    </div>
+
+    <div class="flex justify-end w-full py-2 pr-6">
+        <div id="drawn-count" class="text-lg font-semibold">
+            已抽 0 個籤
+        </div>
+    </div>
+    
+
+    <!-- 側選單 -->
+    <div id="side-menu" class="fixed top-0 left-0 h-full w-1/3 bg-[#E68D19] shadow-lg transform -translate-x-full transition-transform duration-300 z-50">
+        <p id="close-menu-button" class="fixed top-5 right-5 text-white">X</p>
+        <div class="p-4 mt-12 w-full">
+            <button id="setup-button" class="text-white px-4 py-2 border-b border-b-white w-full mb-4">設定獎項</button>
+            <button id="undo-button" class="text-white px-4 py-2 border-b border-b-white	w-full mb-4">回朔前一支籠</button>
+            <button id="history-button" class="text-white px-4 py-2 border-b border-b-white w-full mb-4">查看抽獎歷史</button>
+            <button id="remaining-button" class="text-white px-4 py-2 border-b border-b-white w-full mb-4">查看剩餘獎項</button>
+            <button id="clear-button" class="text-white px-4 py-2 border-b border-b-white w-full mb-4">清空獎項</button>
+        </div>
+    </div>
+
+    <!-- 獎品區域 -->
+    <div class="w-full flex justify-center items-center">
+        <div id="prizes-container" class="md:mx-4 mx-8 flex justify-center items-center w-full">
+            <div id="prizes" class="grid grid-cols-3 gap-4 w-full max-w-screen-md">
+            <!-- 卡片内容由 JavaScript 动态生成 -->
+            </div>
+        </div>
+    </div>
+        <!-- 側選單按鈕 -->
+            <button 
+                id="menu-toggle" 
+                class="absolute left-10 top-10 bg-black text-white p-4 rounded-full shadow-md opacity-10">☰
+            </button>
+
+    <!-- 確認領取獎項彈窗 -->
+    <div id="confirm-prize-modal" class="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div
+          class="flex flex-col justify-start items-center w-1/2 h-1/4 gap-6 rounded-[10px] bg-white shadow-xl" >
+          <!-- 標題 -->
+          <p class="text-4xl text-black mt-8">確認領獎</p>
+      
+          <!-- 圖標 -->
+          <div class="flex items-center justify-center w-24 h-24">
+            <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M25 0C11.25 0 0 11.25 0 25C0 38.75 11.25 50 25 50C38.75 50 50 38.75 50 25C50 11.25 38.75 0 25 0ZM25 45C13.975 45 5 36.025 5 25C5 13.975 13.975 5 25 5C36.025 5 45 13.975 45 25C45 36.025 36.025 45 25 45ZM36.475 13.95L20 30.425L13.525 23.975L10 27.5L20 37.5L40 17.5L36.475 13.95Z" fill="#339F4E"/>
+            </svg>                
+          </div>
+      
+          <!-- 提示信息 -->
+          <p class=" text-xl text-center text-black">請確認您已領取獎項</p>
+      
+          <!-- 確認按鈕 -->
+          <button class="w-1/3 py-2 mb-6 rounded bg-[#FF3A3D] text-white text-lg cursor-pointer hover:bg-gray-600 rounded-[5px]" onclick="closeConfirmPrizeModal()">確認</button>
+        </div>
+    </div>    
+    
+    <!-- 卡片旋轉 -->
+    <div id="flip-card-modal" class="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="flip-card w-4/5 aspect-square mx-6">
+            <img src="cb_ticket.jpg" alt="Rotating Image" class="w-full max-w-3/5 h-auto max-h-full object-contain rounded-[10px] shadow-xl">
+        </div>
+    </div>
+
+    <!-- 音效 -->
+    <audio id="draw-sound" src="draw.mp3"></audio>
+
+    <div id="prize-modal" class="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="relative mx-3 w-full max-w-md h-full max-h-[560px] rounded-[10px] bg-white flex flex-col items-center shadow-xl">
+            <!-- 上半部分 -->
+            <div class="w-full h-[40%] rounded-t-[10px] bg-[#d9d9d9]">
+                <img class="h-full rounded-t-[10px]" src="modal_header.png">
+            </div>
+          
+            <!-- 獎品圖標 -->
+            <div class="flex flex-col items-center mt-[-50px]">
+                <div class="relative flex items-center justify-center w-[100px] h-[100px]">
+                    <img src="modal_logo.png" class="rounded-full">
+                </div>
+            </div>
+          
+            <!-- 獎品名稱 -->
+            <p id="prize-title" class="mt-8 text-4xl font-medium text-black">恭喜抽中</p>
+            <p id="prize-name" class="mt-8 text-4xl font-medium text-black">飲料提袋!!</p>
+          
+            <!-- 領取按鈕 -->
+            <button class="shadow-md w-1/2 h-20 absolute bottom-[-32.5px] left-1/2 transform -translate-x-1/2 rounded-[10px] bg-[#FF3A3D] shadow-xl text-2xl font-semibold cursor-pointer text-white" onclick="closePrizeModal()">
+              立即領取
+            </button>
+          </div>
+    </div>
+              
+    <!-- 抽獎歷史彈窗 -->
+    <div id="history-modal" class="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="h-[80%] w-[80%] modal-content bg-white rounded-[10px] shadow-lg p-6 flex flex-col">
+            <h3 class="text-2xl font-semibold mb-4 ">抽獎歷史紀錄</h3>
+            <div class="overflow-y-auto h-full">
+                <ul id="history-list" class="list-disc list-inside text-gray-700"></ul>
+            </div>
+            <div class="flex">
+                <button class="bg-red-500 text-white px-4 py-2 rounded shadow-md hover:bg-red-600 mt-4" onclick="closeHistoryModal()">關閉</button>
+                <div class="flex item-stretch justify-center">
+                    <button id="arrow_left" class="text-white px-1 py-2 rounded mt-4" onclick="">
+                        <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M42 25C42 34.4 34.4 42 25 42C15.6 42 8 34.4 8 25C8 15.6 15.6 8 25 8C34.4 8 42 15.6 42 25ZM10 25C10 33.3 16.7 40 25 40C33.3 40 40 33.3 40 25C40 16.7 33.3 10 25 10C16.7 10 10 16.7 10 25Z" fill="black"/>
+                            <path d="M26.7001 16.7L18.4001 25L26.7001 33.3L25.3001 34.7L15.6001 25L25.3001 15.2999L26.7001 16.7Z" fill="black"/>
+                            <path d="M17 26L17 24L34 24L34 26L17 26Z" fill="black"/>
+                        </svg>                        
+                    </button>
+                    <div id="history-pages" class=" flex"></div>
+                    <button id="arrow_left" class="text-white px-1 py-2 rounded mt-4" onclick="">
+                        <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 25C8 15.6 15.6 8 25 8C34.4 8 42 15.6 42 25C42 34.4 34.4 42 25 42C15.6 42 8 34.4 8 25ZM40 25C40 16.7 33.3 10 25 10C16.7 10 10 16.7 10 25C10 33.3 16.7 40 25 40C33.3 40 40 33.3 40 25Z" fill="black"/>
+                            <path d="M23.2999 33.3L31.5999 25L23.2999 16.7L24.6999 15.3L34.3999 25L24.6999 34.7L23.2999 33.3Z" fill="black"/>
+                            <path d="M33 24L33 26L16 26L16 24L33 24Z" fill="black"/>
+                        </svg>                                             
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 剩餘獎項彈窗 -->
+    <div id="remaining-modal" class="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="modal-content bg-white rounded-[10px] shadow-lg p-6 w-11/12 max-w-md">
+            <h3 class="text-2xl font-semibold mb-4">剩餘獎項</h3>
+            <div id="remaining-content" class="text-gray-700"></div>
+            <button class="bg-red-500 text-white px-4 py-2 rounded shadow-md hover:bg-red-600 mt-4" onclick="closeRemainingModal()">關閉</button>
+        </div>
+    </div>
+
+    <!-- 設定獎項彈窗 -->
+    <div id="setup-modal" class="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="modal-content bg-white rounded-[10px] shadow-lg p-6 w-11/12 max-w-md">
+            <h3 class="text-2xl font-semibold mb-4">設定獎項</h3>
+            <form id="setup-form" class="space-y-4">
+                <div id="prize-inputs">
+                    <div class="flex items-center mb-2">
+                        <input type="text" placeholder="獎項名稱" class="prize-name border border-gray-300 rounded px-4 py-2 w-full mr-2">
+                        <input type="number" placeholder="數量" class="prize-count border border-gray-300 rounded px-4 py-2 w-1/4">
+                    </div>
+                </div>
+                <button type="button" id="add-prize-input" class="bg-blue-400 text-white px-3 py-2 rounded shadow-md hover:bg-blue-500">+</button>
+                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded shadow-md hover:bg-green-600">確認</button>
+            </form>
+            <button class="bg-red-500 text-white px-4 py-2 rounded shadow-md hover:bg-red-600 mt-4" onclick="closeSetupModal()">關閉</button>
+        </div>
+    </div>
+
+          
+    <script>
+        // 側選單控制邏輯
+        const menuToggle = document.getElementById('menu-toggle');
+        const sideMenu = document.getElementById('side-menu');
+        const overlay = document.getElementById('overlay');
+        const closeMenuButton = document.getElementById('close-menu-button');
+
+        menuToggle.addEventListener('click', () => {
+            if (sideMenu.classList.contains('-translate-x-full')) {
+                sideMenu.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sideMenu.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        });
+
+        // 點擊側選單的任一按鈕時關閉側選單
+        document.querySelectorAll('#side-menu button').forEach(button => {
+            button.addEventListener('click', () => {
+                sideMenu.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            });
+        });
+        closeMenuButton.addEventListener('click', (e) => {
+            sideMenu.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+            e.preventDefault();
+            e.stopPropagation();
+        })
+
+        overlay.addEventListener('click', (e) => {
+            sideMenu.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+            e.preventDefault();
+            e.stopPropagation();
+        });
+
+        overlay.addEventListener('touchstart', (e) => {
+            sideMenu.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+            e.preventDefault();
+            e.stopPropagation();
+        });
+        // 預設獎項
+        const defaultPrizes = [
+        { name: "飲料提袋", count: 150 },
+        { name: "薯條夾", count: 50 },
+        { name: "硅藻土杯墊", count: 20 },
+        { name: "帽子", count: 20 },
+        { name: "摺疊碗", count: 30 },
+        { name: "保溫杯", count: 100 },
+        { name: "側背小帥包", count: 1 },
+        { name: "星巴克紅色隨行杯", count: 1 },
+        { name: "重低音藍芭喇叭", count: 1 },
+        ];
+        // 獎品資料
+        let prizes = JSON.parse(localStorage.getItem("prizes")) || [];
+        let historyRecords = JSON.parse(localStorage.getItem("historyRecords")) || [];
+        let drawnCount = parseInt(localStorage.getItem('drawnCount')) || historyRecords.length;
+        updateDrawnCountDisplay();
+        let prizesLeft = JSON.parse(localStorage.getItem("prizesLeft")) || [];
+        let previousDrawn = historyRecords[historyRecords.length - 1]?.prize;
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+        
+        // 初始化頁面
+        function setupPrizes() {
+            const prizesDiv = document.getElementById("prizes");
+            prizesDiv.innerHTML = ""; // 清空內容
+            
+            let cardCount; // 定義在外部，使用 `let` 可以在後續賦值
+
+            // 設置顯示的卡片數量，根據裝置類型顯示 8, 9或 16 個卡片
+            if(window.innerWidth < 460) {cardCount = 8;}
+            else if(window.innerWidth > 460 && innerWidth < 769) {cardCount = 9;}
+            else {cardCount = 16}
+
+        
+            for (let i = 0; i < cardCount; i++) {
+                const card = document.createElement("div");
+                card.className = "flip-card";
+                card.onclick = (e) => {
+                    if (!card.classList.contains('flipped') && sideMenu.classList.contains('-translate-x-full')) {
+                        drawPrize(card);
+                    }
+                    e.stopPropagation();
+                };
+        
+                // 卡片內容
+                const cardInner = document.createElement("div");
+                cardInner.className = "flip-card-inner w-full h-full";
+        
+                // 卡片正面
+                const cardFront = document.createElement("div");
+                cardFront.className = "flip-card-front w-full max-w-full h-auto max-h-full object-contain rounded-[10px] shadow-xl";
+                const img = document.createElement("img");
+                img.src = "cb_ticket.jpg";
+                img.alt = "抽獎按鈕圖片";
+                img.className = "w-full h-full object-contain rounded-[10px] shadow-xl";
+                cardFront.appendChild(img);
+        
+                // 卡片背面
+                const cardBack = document.createElement("div");
+                cardBack.className = "flip-card-back w-full h-full bg-blue-200 flex items-center justify-center text-xl font-bold";
+        
+                // 組裝卡片
+                cardInner.appendChild(cardFront);
+                cardInner.appendChild(cardBack);
+                card.appendChild(cardInner);
+        
+                // 添加到容器
+                prizesDiv.appendChild(card);
+            }
+        }
+        
+        // 抽獎邏輯
+        function drawPrize(card) {
+            if (prizes.length > 0) {
+                // 隨機排列獎項列表
+                shuffle(prizes);
+        
+                // 取出第一個獎項
+                const prize = prizes.shift();
+        
+                // 設置卡片背面顯示的獎項名稱
+                card.querySelector(".flip-card-back").textContent = prize;
+                card.classList.add("flipped");
+                
+                // 更新數據
+                drawnCount++;
+                prizesLeft[prize] -= 1;
+        
+                // 更新歷史紀錄
+                const now = new Date().toLocaleString("zh-Hant", { hour12: false });
+                const drawnItem = {index: drawnCount, time: now, prize: prize };
+                historyRecords.push(drawnItem);
+                
+                // 更新本地存儲
+                localStorage.setItem("prizes", JSON.stringify(prizes));
+                localStorage.setItem("historyRecords", JSON.stringify(historyRecords));
+                localStorage.setItem("prizesLeft", JSON.stringify(prizesLeft));
+                localStorage.setItem("drawnCount", drawnCount);
+        
+                updateDrawnCountDisplay();
+        
+                // 顯示抽獎結果彈窗
+                const drawSound = document.getElementById("draw-sound");
+                showFlipCardResult(prize);
+                // 播放抽獎音效
+                drawSound.play();
+            } else {
+                alert("所有獎項已抽完！");
+            }
+        }
+        // 更新已抽到第幾個籠的顯示
+        function updateDrawnCountDisplay() {
+            if(drawnCount){
+                document.getElementById('drawn-count').textContent = `已抽 ${drawnCount} 個籤`;
+            }else{
+                document.getElementById('drawn-count').textContent = `已抽 0 個籤`;
+            }
+        }
+
+        // 顯示抽獎歷史彈窗
+        document.getElementById("history-button").addEventListener("click", () => {
+            const historyList = document.getElementById("history-list");
+            historyList.innerHTML = ""; // 清空原有的歷史紀錄
+            const pages = document.getElementById("history-pages");
+            for(let i = 1; i < historyRecords.length/10; i++){
+                let temp = document.createElement("p");
+                temp.textContent = i;
+                temp.value = i;
+                temp.className = "mx-1 justify-center content-center mt-4";
+                pages.appendChild(temp);
+            }  
+
+            historyRecords.forEach(record => {
+                const listItem = document.createElement("li");
+                listItem.textContent = `序：${record.index} 時間：${record.time} - 獎品：${record.prize}`;
+                historyList.appendChild(listItem);
+            });
+
+            document.getElementById("history-modal").classList.remove("hidden");
+        });
+
+        // 關閉抽獎歷史彈窗
+        function closeHistoryModal() {
+            document.getElementById("history-modal").classList.add("hidden");
+        }
+
+		// 顯示剩餘獎項彈窗
+		document.getElementById("remaining-button").addEventListener("click", () => {
+    		const remainingContent = document.getElementById("remaining-content");
+    		remainingContent.innerHTML = ""; // 清空原有的剩餘內容
+
+    		// 使用 Object.entries() 遍歷 prizesLeft 物件
+    		Object.entries(prizesLeft).forEach(([key, value]) => {
+       			remainingContent.innerHTML += `<p>${key}: ${value} 個</p>`;
+    		});
+
+    		document.getElementById("remaining-modal").classList.remove("hidden");
+		});
+        // 關閉剩餘獎項彈窗
+        function closeRemainingModal() {
+            document.getElementById("remaining-modal").classList.add("hidden");
+        }
+
+        // 打開設定獎項彈窗
+        document.getElementById("setup-button").addEventListener("click", () => {
+    // 預設顯示獎項清單
+    const prizeInputsDiv = document.getElementById("prize-inputs");
+    prizeInputsDiv.innerHTML = "";
+    defaultPrizes.forEach(prize => {
+        const prizeInput = document.createElement("div");
+        prizeInput.className = "flex items-center mb-2";
+        prizeInput.innerHTML = `
+            <input type="text" value="${prize.name}" class="prize-name border border-gray-300 rounded px-4 py-2 w-full mr-2">
+            <input type="number" value="${prize.count}" class="prize-count border border-gray-300 rounded px-4 py-2 w-1/4">
+        `;
+        prizeInputsDiv.appendChild(prizeInput);
+    });
+    document.getElementById("setup-modal").classList.remove("hidden");
+        });
+
+        // 關閉設定獎項彈窗
+        function closeSetupModal() {
+            document.getElementById("setup-modal").classList.add("hidden");
+        }
+
+        // 新增一個獎項輸入欄位
+        document.getElementById("add-prize-input").addEventListener("click", () => {
+            const prizeInputsDiv = document.getElementById("prize-inputs");
+            const newPrizeInput = document.createElement("div");
+            newPrizeInput.className = "flex items-center mb-2";
+            newPrizeInput.innerHTML = `
+                <input type="text" placeholder="獎項名稱" class="prize-name border border-gray-300 rounded px-4 py-2 w-full mr-2">
+                <input type="number" placeholder="數量" class="prize-count border border-gray-300 rounded px-4 py-2 w-1/4">
+            `;
+            prizeInputsDiv.appendChild(newPrizeInput);
+        });
+
+        // 新增獎項邏輯
+        document.getElementById("setup-form").addEventListener("submit", (e) => {
+            e.preventDefault();
+            const prizeNames = document.querySelectorAll(".prize-name");
+            const prizeCounts = document.querySelectorAll(".prize-count");
+
+            prizes = [];
+            prizesLeft = {};
+            prizeNames.forEach((input, index) => {
+                const name = input.value.trim();
+                const count = parseInt(prizeCounts[index].value, 10);
+                prizesLeft[name] = count;
+                
+                if (name && count > 0) {
+                    for (let i = 0; i < count; i++) {
+                        prizes.push(name);
+                    }
+                }
+            });
+            historyRecords = [];
+            drawnCount = 0;
+            localStorage.setItem("prizes", JSON.stringify(prizes)); // 更新本地存儲
+            localStorage.setItem("prizesLeft", JSON.stringify(prizesLeft));
+            localStorage.setItem("historyRecords", JSON.stringify(historyRecords));
+            localStorage.setItem("drawnCount", 0); // 移除本地存儲中的歷史紀錄
+            updateDrawnCountDisplay();
+            closeSetupModal(); // 關閉彈窗
+        });
+
+        // 回朴前一支籠
+        document.getElementById("undo-button").addEventListener("click", () => {
+            showUndoConfirmation();
+        });
+
+        function showUndoConfirmation() {
+            if (confirm("請確認您要回朴上一次抽出的籠。")) {
+                confirmUndoDraw();
+            }
+        }
+
+        function confirmUndoDraw() {
+            if (previousDrawn) {
+                prizes.push(previousDrawn);
+                historyRecords.pop();
+                prizesLeft[previousDrawn] += 1;
+                drawnCount--;
+                localStorage.setItem('drawnCount', drawnCount);
+                updateDrawnCountDisplay();
+                localStorage.setItem("prizes", JSON.stringify(prizes));
+                localStorage.setItem("historyRecords", JSON.stringify(historyRecords));
+                alert(`已成功回朔${previousDrawn}`);
+                previousDrawn = historyRecords[historyRecords.length-1].prize;
+            }
+            closeUndoModal();
+        }
+
+        // 清空獎項
+        document.getElementById("clear-button").addEventListener("click", () => {
+            if (confirm("確定要清空所有獎項嗎？此操作無法復原！")) {
+                prizes = [];
+                historyRecords = [];
+                drawnCount = 0;
+                localStorage.removeItem("prizes"); // 移除本地存儲中的獎項
+                localStorage.removeItem("historyRecords");
+                localStorage.setItem('drawnCount', 0);
+                updateDrawnCountDisplay();
+                setupPrizes(); // 更新顯示
+            }
+        });
+
+        // 點擊彈窗外部關閉彈窗
+        window.addEventListener("click", (e) => {
+            const prizeModal = document.getElementById("prize-modal");
+            const setupModal = document.getElementById("setup-modal");
+            const historyModal = document.getElementById("history-modal");
+            const remainingModal = document.getElementById("remaining-modal");
+            
+            if (e.target === prizeModal) {
+                closePrizeModal();
+            }
+            if (e.target === setupModal) {
+                closeSetupModal();
+            }
+            if (e.target === historyModal) {
+                closeHistoryModal();
+            }
+            if (e.target === remainingModal) {
+                closeRemainingModal();
+            }
+        });
+
+        // 初始化
+        document.addEventListener("DOMContentLoaded", setupPrizes);
+    </script>
+</body>
+</html>
